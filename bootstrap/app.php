@@ -1,9 +1,12 @@
 <?php
 
 use App\Http\Middleware\AssignRequestId;
+use App\Http\Middleware\EnsureAccountIsActive;
 use App\Http\Middleware\EnsureRealMoneyEnabled;
+use App\Http\Middleware\EnsureStaffHasTwoFactor;
 use App\Http\Middleware\HandleAppearance;
 use App\Http\Middleware\HandleInertiaRequests;
+use App\Http\Middleware\ThrottleRegistration;
 use App\Support\Api\ApiResponse;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\AuthenticationException;
@@ -34,6 +37,8 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->encryptCookies(except: ['appearance', 'sidebar_state']);
 
         $middleware->web(append: [
+            EnsureAccountIsActive::class,
+            ThrottleRegistration::class,
             HandleAppearance::class,
             HandleInertiaRequests::class,
             AddLinkHeadersForPreloadedAssets::class,
@@ -41,6 +46,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->alias([
             'real-money' => EnsureRealMoneyEnabled::class,
+            'staff.mfa' => EnsureStaffHasTwoFactor::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

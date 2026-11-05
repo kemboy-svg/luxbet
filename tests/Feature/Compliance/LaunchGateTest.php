@@ -6,6 +6,7 @@ use App\Domain\Compliance\Enums\EnvironmentMode;
 use App\Domain\Compliance\Exceptions\RealMoneyLockedException;
 use App\Domain\Compliance\LaunchGate\LaunchGate;
 use App\Domain\Compliance\Models\LaunchControl;
+use App\Domain\Identity\Authorization\Role;
 use App\Models\User;
 use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -16,9 +17,9 @@ use Inertia\Testing\AssertableInertia as Assert;
 use Tests\TestCase;
 
 /**
- * Required launch-gate tests (instructions.md §11.6) that apply to the
- * foundation milestone. Role-based cases (support agent, super admin) are
- * added with roles and permissions in Milestone 2.
+ * Required launch-gate tests (instructions.md §11.6). Items 7 and 8
+ * (provider endpoints and credentials) arrive with the provider layer in
+ * Milestone 5.
  */
 class LaunchGateTest extends TestCase
 {
@@ -149,6 +150,45 @@ class LaunchGateTest extends TestCase
             ->all();
 
         $this->assertSame([], $writable);
+    }
+
+    /** §11.6 (4) */
+    public function test_a_support_agent_cannot_view_or_change_launch_control(): void
+    {
+        $agent = $this->staffUser(Role::SupportAgent);
+
+        $this->actingAs($agent)->get('/admin/launch-control')->assertForbidden();
+
+        foreach (['post', 'put', 'patch', 'delete'] as $method) {
+            $this->actingAs($agent)->{$method}('/admin/launch-control', ['real_money_enabled' => true])
+                ->assertStatus(405);
+        }
+
+        $this->assertFalse(app(LaunchGate::class)->isRealMoneyEnabled());
+    }
+
+    /** §11.6 (5) */
+    public function test_a_super_admin_can_only_view_launch_control_and_cannot_enable_it(): void
+    {
+        $admin = $this->staffUser(Role::SuperAdmin);
+
+        $this->actingAs($admin)
+            ->get('/admin/launch-control')
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->component('admin/LaunchControl')
+                ->where('gate.real_money_enabled', false));
+
+        foreach (['post', 'put', 'patch', 'delete'] as $method) {
+            $this->actingAs($admin)->{$method}('/admin/launch-control', ['real_money_enabled' => true])
+                ->assertStatus(405);
+            $this->actingAs($admin)->{$method.'Json'}('/api/v1/admin/launch-control', ['real_money_enabled' => true])
+                ->assertNotFound();
+        }
+
+        $this->assertFalse(LaunchControl::current()?->real_money_enabled);
+        $this->assertFalse(app(LaunchGate::class)->isRealMoneyEnabled());
+        $this->assertFalse($admin->can('launch_gate.update'));
     }
 
     public function test_the_launch_gate_command_reports_a_closed_gate(): void

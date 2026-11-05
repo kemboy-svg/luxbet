@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Domain\Compliance\LaunchGate\LaunchGate;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -41,6 +42,11 @@ class HandleInertiaRequests extends Middleware
             'name' => config('app.name'),
             'auth' => [
                 'user' => $request->user(),
+                // The signed-in user's own permissions, for showing or hiding
+                // navigation only. The server still checks every action.
+                'permissions' => fn (): array => $request->user() instanceof User
+                    ? $request->user()->getAllPermissions()->pluck('name')->values()->all()
+                    : [],
             ],
             'luxbet' => function (): array {
                 $gate = app(LaunchGate::class)->status();

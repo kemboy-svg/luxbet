@@ -9,3 +9,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 require __DIR__.'/settings.php';
+
+Route::middleware(['auth', 'verified', 'can:admin.access', 'staff.mfa'])
+    ->prefix('admin')
+    ->name('admin.')
+    ->group(__DIR__.'/admin.php');

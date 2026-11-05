@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { Link } from '@inertiajs/vue3';
-import { BookOpen, FolderGit2, LayoutGrid } from '@lucide/vue';
+import { Link, usePage } from '@inertiajs/vue3';
+import { LayoutGrid, LockKeyhole, ShieldCheck, Users } from '@lucide/vue';
+import { computed } from 'vue';
 import AppLogo from '@/components/AppLogo.vue';
-import NavFooter from '@/components/NavFooter.vue';
 import NavMain from '@/components/NavMain.vue';
 import NavUser from '@/components/NavUser.vue';
 import {
@@ -25,18 +25,35 @@ const mainNavItems: NavItem[] = [
     },
 ];
 
-const footerNavItems: NavItem[] = [
-    {
-        title: 'Repository',
-        href: 'https://github.com/laravel/vue-starter-kit',
-        icon: FolderGit2,
-    },
-    {
-        title: 'Documentation',
-        href: 'https://laravel.com/docs/starter-kits#vue',
-        icon: BookOpen,
-    },
-];
+const page = usePage();
+
+// Admin links are only rendered for staff. The server enforces access on
+// every admin route regardless of what is shown here.
+const adminNavItems = computed<NavItem[]>(() => {
+    const permissions = page.props.auth.permissions ?? [];
+
+    if (!permissions.includes('admin.access')) {
+        return [];
+    }
+
+    const items: NavItem[] = [
+        { title: 'Admin overview', href: '/admin', icon: ShieldCheck },
+    ];
+
+    if (permissions.includes('players.view')) {
+        items.push({ title: 'Players', href: '/admin/players', icon: Users });
+    }
+
+    if (permissions.includes('launch_gate.view')) {
+        items.push({
+            title: 'Launch gate',
+            href: '/admin/launch-control',
+            icon: LockKeyhole,
+        });
+    }
+
+    return items;
+});
 </script>
 
 <template>
@@ -55,10 +72,14 @@ const footerNavItems: NavItem[] = [
 
         <SidebarContent>
             <NavMain :items="mainNavItems" />
+            <NavMain
+                v-if="adminNavItems.length > 0"
+                :items="adminNavItems"
+                label="Administration"
+            />
         </SidebarContent>
 
         <SidebarFooter>
-            <NavFooter :items="footerNavItems" />
             <NavUser />
         </SidebarFooter>
     </Sidebar>
