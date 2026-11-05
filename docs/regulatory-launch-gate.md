@@ -48,8 +48,8 @@ Status is read-only for every role:
 php artisan luxbet:launch-gate
 ```
 
-The admin dashboard (Milestone 6) will show the same `LaunchGateStatus`
-read-only. There is no command, route, setting or seed that changes it, and
+Staff with `launch_gate.view` (compliance officers, super admins) see the
+same `LaunchGateStatus` read-only at `/admin/launch-control`. There is no command, route, setting or seed that changes it, and
 tests assert that no write route to launch control exists.
 
 ## What lifting the gate would require
@@ -64,7 +64,6 @@ controls). The development team must not do this on its own initiative.
 ## Tests
 
 `tests/Feature/Compliance/LaunchGateTest.php` and
-`tests/Unit/Compliance/LaunchGateEvaluationTest.php` cover §11.6 items 1, 2, 3,
-5 (no write route), 6 (no withdrawal endpoints), 9 and 10. Items 4 and 5
-(role-based) arrive with roles in Milestone 2; items 7 and 8 (provider
-endpoints and credentials) with the provider layer in Milestone 5.
+`tests/Unit/Compliance/LaunchGateEvaluationTest.php` cover §11.6 items 1–6, 9
+and 10. Items 7 and 8 (provider endpoints and credentials) arrive with the
+provider layer in Milestone 5.

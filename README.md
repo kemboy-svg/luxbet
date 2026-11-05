@@ -42,6 +42,19 @@ composer run dev
 Open http://localhost:8000. Emails (verification, password reset) are caught by
 Mailpit at http://localhost:8025.
 
+### Staff accounts
+
+Everyone who registers is a demo player. To make a local staff account,
+register normally, then:
+
+```bash
+php artisan tinker --execute="App\Models\User::where('email', 'you@example.test')->firstOrFail()->assignRole('super_admin');"
+```
+
+Staff must turn on two-factor authentication (Settings → Security) before the
+admin area at `/admin` opens. Roles and permissions are listed in
+[docs/security.md](docs/security.md).
+
 The Docker stack also includes `app` (PHP-FPM) and `nginx` services if you
 prefer to run everything in containers: `docker compose up -d`, then
 http://localhost:8080.
