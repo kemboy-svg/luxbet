@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Domain\Compliance\LaunchGate\LaunchGate;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -41,6 +42,18 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $request->user(),
             ],
+            'luxbet' => function (): array {
+                $gate = app(LaunchGate::class)->status();
+
+                return [
+                    'environmentMode' => $gate->environmentMode->value,
+                    'realMoneyEnabled' => $gate->realMoneyEnabled,
+                    'demoNotice' => [
+                        'title' => config('luxbet.demo_notice.title'),
+                        'body' => config('luxbet.demo_notice.body'),
+                    ],
+                ];
+            },
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
         ];
     }
