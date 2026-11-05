@@ -154,7 +154,7 @@ class LaunchGateEvaluationTest extends TestCase
             'approved_jurisdictions' => ['MU'],
             'approval_reference' => 'TEST-REF-001',
             'approval_document_path' => 'approvals/test-ref-001.pdf',
-            'approved_by' => 42,
+            'approved_by' => '9b2f8c1e-0000-4000-8000-000000000042',
             'approved_at' => $this->now->subMonth(),
             'review_due_at' => $this->now->addMonths(6),
             'change_reason' => 'Fictional test fixture — not a real approval.',

@@ -23,7 +23,7 @@ return new class extends Migration
             $table->jsonb('approved_jurisdictions')->default(DB::raw("'[]'::jsonb"));
             $table->string('approval_reference')->nullable();
             $table->string('approval_document_path')->nullable();
-            $table->foreignId('approved_by')->nullable()->constrained('users')->restrictOnDelete();
+            $table->foreignUuid('approved_by')->nullable()->constrained('users')->restrictOnDelete();
             $table->timestampTz('approved_at')->nullable();
             $table->timestampTz('review_due_at')->nullable();
             $table->text('change_reason')->nullable();
