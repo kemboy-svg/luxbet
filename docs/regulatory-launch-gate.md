@@ -65,5 +65,5 @@ controls). The development team must not do this on its own initiative.
 
 `tests/Feature/Compliance/LaunchGateTest.php` and
 `tests/Unit/Compliance/LaunchGateEvaluationTest.php` cover §11.6 items 1–6, 9
-and 10. Items 7 and 8 (provider endpoints and credentials) arrive with the
-provider layer in Milestone 5.
+and 10. Items 7 and 8 (production provider endpoints and credentials) are in
+`tests/Feature/GameProviders/LaunchTest.php`.
