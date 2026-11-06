@@ -33,7 +33,7 @@ npm install
 # 3. Configure the environment
 cp .env.example .env
 php artisan key:generate
-php artisan migrate
+php artisan migrate --seed   # seeds the local simulator games and test@example.com / password
 
 # 4. Run the app (Laravel server, queue, logs and Vite together)
 composer run dev

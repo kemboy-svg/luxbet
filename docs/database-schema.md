@@ -139,7 +139,43 @@ cash ledger (ADR-002).
 `demo_win`, `demo_refund`, `demo_adjustment`), debits subtract (`demo_bet`,
 `demo_adjustment`), and `after = before ± amount`.
 
+## `game_providers`
+
+| Column | Type | Notes |
+| --- | --- | --- |
+| `id` | uuid PK | |
+| `name` | varchar(100) | |
+| `slug` | varchar(64), unique | kebab-case |
+| `environment` | varchar | `sandbox` or `production` |
+| `status` | varchar | `inactive`, `sandbox`, `active`, `suspended` |
+| `base_url` | varchar, null | Must start with `https://` |
+| `credentials_secret_reference` | varchar, null | Reference only, never a secret; hidden from JSON |
+| `webhook_signing_key_reference` | varchar, null | Reference only; hidden from JSON |
+| `supports_demo` | boolean | |
+| `is_simulator` | boolean | True for the local simulator |
+
+## `games`
+
+| Column | Type | Notes |
+| --- | --- | --- |
+| `id` | uuid PK | |
+| `provider_id` | uuid FK → `game_providers.id` | Restrict on delete |
+| `provider_game_code` | varchar(100) | Unique per provider; never sent to the browser |
+| `name` | varchar(100) | |
+| `slug` | varchar(100), unique | Public URL `/games/{slug}` |
+| `category` | varchar | `slots`, `live_casino`, `blackjack`, `baccarat`, `poker`, `crash` |
+| `thumbnail_path` | varchar, null | |
+| `description` | text, null | |
+| `supports_demo` | boolean | |
+| `is_enabled` | boolean | |
+| `sort_order` | integer | |
+| `metadata` | jsonb object | Tile art (`tile.title`, `tile.background`, `tile.border`), `featured` |
+
+A game is **listed** when it is enabled and its provider is `sandbox` or
+`active`. It is **playable** when it is also `supports_demo` and its provider
+supports demo play in the `sandbox` environment. A category is available only
+when it has at least one playable game.
+
 ## Planned tables
 
-`game_providers`, `games`, `game_sessions`, `provider_webhook_events`,
-`responsible_play_settings`. See `instructions.md` §5.1.
+`game_sessions`, `provider_webhook_events`, `responsible_play_settings`. See `instructions.md` §5.1.
