@@ -136,7 +136,7 @@ await shot('candy-crown-mobile');
 
 await browser.close();
 
-for (const e of report.consoleErrors) fail(`console: ${e}`);
+for (const e of report.consoleErrors) fail(`console: ${String(e)}`);
 writeFileSync(`${OUT}report.json`, JSON.stringify(report, null, 2));
 
 if (report.failures.length > 0) {
