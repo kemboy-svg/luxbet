@@ -31,14 +31,16 @@ class AppServiceProvider extends ServiceProvider
     }
 
     /**
-     * Rate limits for the versioned JSON API.
+     * Rate limits for the versioned JSON API. Simulator rounds have their own
+     * 60-per-minute limit on top of this one, so this leaves room for the
+     * other calls a fast player makes.
      */
     protected function configureRateLimiting(): void
     {
         RateLimiter::for('api', function (Request $request): Limit {
             $key = $request->user()?->getAuthIdentifier() ?? $request->ip();
 
-            return Limit::perMinute(60)->by(is_scalar($key) ? (string) $key : 'anonymous');
+            return Limit::perMinute(120)->by(is_scalar($key) ? (string) $key : 'anonymous');
         });
     }
 

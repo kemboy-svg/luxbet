@@ -38,23 +38,23 @@ Route::middleware(['api.session', 'auth', 'verified', 'throttle:api'])->group(fu
 
     Route::post('demo-wallets/{wallet}/reset', [DemoWalletController::class, 'reset'])
         ->whereUuid('wallet')
-        ->middleware('throttle:10,1')
+        ->middleware('throttle:10,1,api.v1.demo-wallets.reset')
         ->name('api.v1.demo-wallets.reset');
 
     Route::post('games/{slug}/demo-session', [GameSessionController::class, 'store'])
         ->where('slug', '[a-z0-9]+(?:-[a-z0-9]+)*')
-        ->middleware('throttle:20,1')
+        ->middleware('throttle:20,1,api.v1.games.demo-session')
         ->name('api.v1.games.demo-session');
 
     Route::get('game-sessions', [GameSessionController::class, 'index'])->name('api.v1.game-sessions.index');
     Route::get('game-sessions/{session}', [GameSessionController::class, 'show'])->name('api.v1.game-sessions.show');
     Route::post('game-sessions/{session}/simulator-rounds', [GameSessionController::class, 'simulatorRound'])
-        ->middleware('throttle:60,1')
+        ->middleware('throttle:60,1,api.v1.game-sessions.simulator-rounds')
         ->name('api.v1.game-sessions.simulator-rounds');
 });
 
 // Provider webhooks: no session or CSRF; authenticity comes from the
 // provider's signature, checked before anything is processed.
 Route::post('webhooks/providers/{provider:slug}', ProviderWebhookController::class)
-    ->middleware('throttle:600,1')
+    ->middleware('throttle:600,1,api.v1.webhooks.providers')
     ->name('api.v1.webhooks.providers');
