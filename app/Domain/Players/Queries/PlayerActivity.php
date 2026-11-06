@@ -73,8 +73,8 @@ class PlayerActivity
         $sessions = GameSession::query()
             ->where('user_id', $user->id)
             ->where('created_at', '>=', $start)
-            ->selectRaw('date(created_at) as day, count(*) as total')
-            ->groupBy(DB::raw('date(created_at)'))
+            ->selectRaw('date(created_at at time zone ?) as day, count(*) as total', [config('app.timezone')])
+            ->groupBy('day')
             ->toBase()
             ->pluck('total', 'day');
 
@@ -82,8 +82,8 @@ class PlayerActivity
             ->whereIn('wallet_id', $user->demoWallets()->select('id'))
             ->where('type', DemoTransactionType::Bet->value)
             ->where('created_at', '>=', $start)
-            ->selectRaw('date(created_at) as day, count(*) as total')
-            ->groupBy(DB::raw('date(created_at)'))
+            ->selectRaw('date(created_at at time zone ?) as day, count(*) as total', [config('app.timezone')])
+            ->groupBy('day')
             ->toBase()
             ->pluck('total', 'day');
 

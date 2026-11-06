@@ -62,7 +62,13 @@ class StaffController extends Controller
         $actor = $request->user();
 
         try {
-            $manage->create($actor, $validated['name'], $validated['email'], Role::from($validated['role']), trim($validated['reason']));
+            $manage->create(
+                $actor,
+                (string) $validated['name'],
+                (string) $validated['email'],
+                Role::from((string) $validated['role']),
+                trim((string) $validated['reason']),
+            );
         } catch (StaffManagementException $e) {
             return back()->withErrors(['email' => $e->getMessage()]);
         }
@@ -96,7 +102,7 @@ class StaffController extends Controller
         $actor = $request->user();
 
         try {
-            $apply($actor, Role::from($validated['role']), trim($validated['reason']));
+            $apply($actor, Role::from((string) $validated['role']), trim((string) $validated['reason']));
         } catch (StaffManagementException $e) {
             return back()->withErrors(['role' => $e->getMessage()]);
         }

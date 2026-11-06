@@ -207,6 +207,24 @@ Only a SHA-256 hash of the payload is kept, never the body.
 | `failure_reason` | varchar, null | e.g. `refund_without_bet`, `session_closed` |
 | `received_at`, `processed_at` | timestamptz | |
 
-## Planned tables
+## `responsible_play_settings`
 
-`responsible_play_settings`. See `instructions.md` §5.1.
+One row per player, created on first save. Missing rows mean the defaults.
+
+| Column | Type | Notes |
+| --- | --- | --- |
+| `id` | uuid PK | |
+| `user_id` | uuid FK, unique | Cascades on user delete |
+| `demo_session_reminder_minutes` | smallint, null | Check: 15, 30, 45, 60 or 90; null means off. Default 45 |
+| `marketing_opt_in` | boolean | Default false; changes are audited |
+| `created_at`, `updated_at` | timestamptz | |
+
+## `favourite_games`
+
+| Column | Type | Notes |
+| --- | --- | --- |
+| `user_id` | uuid FK | Primary key with `game_id` |
+| `game_id` | uuid FK | |
+| `created_at` | timestamptz | Default now |
+
+Only listed games can be added; hidden games simply drop out of the list.

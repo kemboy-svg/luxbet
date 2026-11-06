@@ -64,6 +64,17 @@ The Docker stack also includes `app` (PHP-FPM) and `nginx` services if you
 prefer to run everything in containers: `docker compose up -d`, then
 http://localhost:8080.
 
+## What's in the app
+
+- **Players:** game lobby, demo play with the local simulator, demo wallet,
+  dashboard with recent activity, favourites, play history, profile
+  preferences and responsible-play settings (session reminders, marketing
+  opt-in).
+- **Staff (`/admin`):** overview with demo-play metrics, players (detail,
+  status, demo-credit adjustments), games, providers, provider events, demo
+  ledger, audit log, system health, staff management and the read-only
+  launch-gate status. Each screen needs its own permission.
+
 ## Checks
 
 ```bash

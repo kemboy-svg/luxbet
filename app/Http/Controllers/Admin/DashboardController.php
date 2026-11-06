@@ -16,7 +16,6 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Carbon\CarbonImmutable;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Date;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -73,16 +72,16 @@ class DashboardController extends Controller
 
         $sessionsPerDay = GameSession::query()
             ->where('created_at', '>=', $start)
-            ->selectRaw('date(created_at) as day, count(*) as total')
-            ->groupBy(DB::raw('date(created_at)'))
+            ->selectRaw('date(created_at at time zone ?) as day, count(*) as total', [config('app.timezone')])
+            ->groupBy('day')
             ->toBase()
             ->pluck('total', 'day');
 
         $bets = DemoWalletTransaction::query()
             ->where('type', DemoTransactionType::Bet->value)
             ->where('created_at', '>=', $start)
-            ->selectRaw('date(created_at) as day, count(*) as rounds, sum(amount_minor) as staked')
-            ->groupBy(DB::raw('date(created_at)'))
+            ->selectRaw('date(created_at at time zone ?) as day, count(*) as rounds, sum(amount_minor) as staked', [config('app.timezone')])
+            ->groupBy('day')
             ->toBase()
             ->get()
             ->keyBy('day');
