@@ -37,8 +37,14 @@ class PlayController extends Controller
             return back()->withErrors(['play' => $e->getMessage()]);
         }
 
-        // The URL has already passed the launch allowlist.
-        return Inertia::location($launch['launch_url']);
+        // The URL has already passed the launch allowlist. Our own simulator
+        // screen is an Inertia page, so a normal redirect keeps it a smooth
+        // client-side visit; an external provider needs a full page load.
+        $url = $launch['launch_url'];
+
+        return str_starts_with($url, rtrim(url('/'), '/').'/')
+            ? redirect()->to($url)
+            : Inertia::location($url);
     }
 
     /**
