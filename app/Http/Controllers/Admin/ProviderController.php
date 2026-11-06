@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Domain\Audit\AuditLogger;
+use App\Domain\GameProviders\Support\ProviderAdapterRegistry;
 use App\Domain\Games\Models\GameProvider;
 use App\Domain\Identity\Authorization\Permission;
 use App\Http\Controllers\Controller;
@@ -19,7 +20,7 @@ use Inertia\Response;
  */
 class ProviderController extends Controller
 {
-    public function index(Request $request): Response
+    public function index(Request $request, ProviderAdapterRegistry $adapters): Response
     {
         $providers = GameProvider::query()
             ->withCount('games')
@@ -35,6 +36,9 @@ class ProviderController extends Controller
                 'can_serve_demo' => $provider->canServeDemo(),
                 'games_count' => (int) $provider->getAttribute('games_count'),
                 'credentials_configured' => $provider->credentials_secret_reference !== null,
+                'health' => $adapters->has($provider)
+                    ? $adapters->for($provider)->health($provider)->toArray()
+                    : ['available' => false, 'latency_ms' => null, 'message' => 'No adapter configured.'],
             ])
             ->all();
 
