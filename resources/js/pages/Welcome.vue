@@ -12,6 +12,7 @@ import {
     X,
 } from '@lucide/vue';
 import { computed, ref } from 'vue';
+import heroHost from '../../images/hero-host.webp';
 import CategoryIcon from '@/components/luxbet/CategoryIcon.vue';
 import GameTile from '@/components/luxbet/GameTile.vue';
 import HeroScene from '@/components/luxbet/HeroScene.vue';
@@ -157,6 +158,14 @@ const trustPoints = [
                     class="relative h-[460px] overflow-hidden md:h-[540px]"
                 >
                     <HeroScene />
+                    <img
+                        :src="heroHost"
+                        alt=""
+                        width="804"
+                        height="900"
+                        fetchpriority="high"
+                        class="pointer-events-none absolute right-[22%] bottom-0 z-[5] hidden h-[104%] w-auto drop-shadow-[0_20px_40px_rgba(0,0,0,0.55)] md:block lg:right-[24%]"
+                    />
                     <div
                         class="relative z-10 flex h-full max-w-[640px] flex-col justify-center px-5 pb-16 md:px-12 md:pb-10"
                     >
@@ -223,7 +232,7 @@ const trustPoints = [
                                 >
                                 <CategoryIcon
                                     :category="category.id"
-                                    class="h-14 w-16"
+                                    class="h-14"
                                 />
                                 <span class="text-base font-semibold">{{
                                     category.name

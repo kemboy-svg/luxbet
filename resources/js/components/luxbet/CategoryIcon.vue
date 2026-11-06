@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import liveCasinoHost from '../../../images/live-casino-host.webp';
 import type { GameCategory } from '@/types/luxbet';
 
 defineProps<{
@@ -7,7 +8,16 @@ defineProps<{
 </script>
 
 <template>
-    <svg aria-hidden="true" viewBox="0 0 64 56">
+    <img
+        v-if="category === 'live_casino'"
+        :src="liveCasinoHost"
+        alt=""
+        width="256"
+        height="256"
+        loading="lazy"
+        class="aspect-square w-auto rounded-full object-cover ring-2 ring-gold-500"
+    />
+    <svg v-else aria-hidden="true" viewBox="0 0 64 56">
         <g v-if="category === 'slots'">
             <rect
                 x="10"
@@ -31,21 +41,6 @@ defineProps<{
             />
             <circle cx="59" cy="14" r="4" fill="#E3223F" />
             <rect x="20" y="38" width="24" height="5" rx="2" fill="#8A5A06" />
-        </g>
-        <g v-else-if="category === 'live_casino'">
-            <rect x="6" y="14" width="40" height="30" rx="6" fill="#7B3FE4" />
-            <path d="M46 24 L58 16 V42 L46 34 Z" fill="#B48CFF" />
-            <circle cx="16" cy="22" r="4" fill="#FF3B5C" />
-            <text
-                x="20"
-                y="40"
-                font-family="Poppins, sans-serif"
-                font-weight="800"
-                font-size="11"
-                fill="#FFFFFF"
-            >
-                LIVE
-            </text>
         </g>
         <g v-else-if="category === 'blackjack'">
             <rect
