@@ -21,7 +21,14 @@ class ProfileController extends Controller
      */
     public function edit(Request $request): Response
     {
+        $profile = $request->user()?->playerProfile;
+
         return Inertia::render('settings/Profile', [
+            'playerProfile' => $profile === null ? null : [
+                'username' => $profile->username,
+                'country_code' => $profile->country_code,
+                'preferred_locale' => $profile->preferred_locale,
+            ],
             'mustVerifyEmail' => $request->user() instanceof MustVerifyEmail
                 && config('luxbet.require_email_verification') === true,
             'status' => $request->session()->get('status'),
@@ -33,13 +40,23 @@ class ProfileController extends Controller
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
-        $request->user()->fill($request->validated());
+        $user = $request->user();
+        $validated = $request->validated();
 
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
+        $user->fill(array_intersect_key($validated, array_flip(['name', 'email'])));
+
+        if ($user->isDirty('email')) {
+            $user->email_verified_at = null;
         }
 
-        $request->user()->save();
+        $user->save();
+
+        $profile = $user->playerProfile;
+
+        if ($profile !== null) {
+            $profile->fill(array_intersect_key($validated, array_flip(['username', 'country_code', 'preferred_locale'])));
+            $profile->save();
+        }
 
         Inertia::flash('toast', ['type' => 'success', 'message' => __('Profile updated.')]);
 

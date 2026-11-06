@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Settings\ProfileController;
+use App\Http\Controllers\Settings\ResponsiblePlayController;
 use App\Http\Controllers\Settings\SecurityController;
 use Illuminate\Auth\Middleware\RequirePassword;
 use Illuminate\Support\Facades\Route;
@@ -23,7 +24,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->middleware('throttle:6,1')
         ->name('user-password.update');
 
-    Route::inertia('settings/appearance', 'settings/Appearance')->name('appearance.edit');
+    Route::get('settings/responsible-play', [ResponsiblePlayController::class, 'edit'])->name('responsible-play.edit');
+    Route::patch('settings/responsible-play', [ResponsiblePlayController::class, 'update'])->name('responsible-play.update');
 });
 
 Route::get('.well-known/passkey-endpoints', function () {

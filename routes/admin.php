@@ -1,12 +1,17 @@
 <?php
 
+use App\Http\Controllers\Admin\AuditLogController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\DemoTransactionController;
 use App\Http\Controllers\Admin\DemoWalletAdjustmentController;
 use App\Http\Controllers\Admin\GameController;
 use App\Http\Controllers\Admin\LaunchControlController;
 use App\Http\Controllers\Admin\PlayerController;
 use App\Http\Controllers\Admin\PlayerStatusController;
 use App\Http\Controllers\Admin\ProviderController;
+use App\Http\Controllers\Admin\StaffController;
+use App\Http\Controllers\Admin\SystemHealthController;
+use App\Http\Controllers\Admin\WebhookEventController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -27,6 +32,11 @@ Route::get('/', DashboardController::class)->name('dashboard');
 Route::get('players', [PlayerController::class, 'index'])
     ->middleware('can:players.view')
     ->name('players.index');
+
+Route::get('players/{player}', [PlayerController::class, 'show'])
+    ->whereUuid('player')
+    ->middleware('can:players.view')
+    ->name('players.show');
 
 Route::patch('players/{player}/status', PlayerStatusController::class)
     ->whereUuid('player')
@@ -59,3 +69,35 @@ Route::patch('providers/{provider}/status', [ProviderController::class, 'updateS
 Route::get('launch-control', LaunchControlController::class)
     ->middleware('can:launch_gate.view')
     ->name('launch-control.show');
+
+Route::get('demo-transactions', [DemoTransactionController::class, 'index'])
+    ->middleware('can:demo_wallet.view')
+    ->name('demo-transactions.index');
+
+Route::get('provider-events', [WebhookEventController::class, 'index'])
+    ->middleware('can:providers.view')
+    ->name('provider-events.index');
+
+Route::get('audit-log', [AuditLogController::class, 'index'])
+    ->middleware('can:audit.view')
+    ->name('audit-log.index');
+
+Route::get('system-health', SystemHealthController::class)
+    ->middleware('can:reports.view')
+    ->name('system-health');
+
+// Staff management: re-confirm the password before changing who has access.
+Route::middleware(['can:staff.manage', 'password.confirm'])->group(function () {
+    Route::get('staff', [StaffController::class, 'index'])->name('staff.index');
+    Route::post('staff', [StaffController::class, 'store'])
+        ->middleware('throttle:10,1')
+        ->name('staff.store');
+    Route::post('staff/{staff}/roles', [StaffController::class, 'grant'])
+        ->whereUuid('staff')
+        ->middleware('throttle:30,1')
+        ->name('staff.roles.store');
+    Route::delete('staff/{staff}/roles', [StaffController::class, 'revoke'])
+        ->whereUuid('staff')
+        ->middleware('throttle:30,1')
+        ->name('staff.roles.destroy');
+});

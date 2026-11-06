@@ -5,6 +5,7 @@ namespace Tests\Feature\Settings;
 use App\Domain\Identity\Enums\UserStatus;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Inertia\Testing\AssertableInertia as Assert;
 use Tests\TestCase;
 
 class ProfileUpdateTest extends TestCase
@@ -100,5 +101,52 @@ class ProfileUpdateTest extends TestCase
             ->assertRedirect(route('profile.edit'));
 
         $this->assertSame(UserStatus::Active, $user->fresh()?->status);
+    }
+
+    public function test_players_can_update_their_username_country_and_language()
+    {
+        $player = $this->playerUser();
+
+        $this->actingAs($player)
+            ->patch(route('profile.update'), [
+                'name' => $player->name,
+                'email' => $player->email,
+                'username' => 'golden_owl',
+                'country_code' => 'MU',
+                'preferred_locale' => 'fr',
+            ])
+            ->assertSessionHasNoErrors()
+            ->assertRedirect(route('profile.edit'));
+
+        $profile = $player->fresh()?->playerProfile;
+        $this->assertSame('golden_owl', $profile?->username);
+        $this->assertSame('MU', $profile?->country_code);
+        $this->assertSame('fr', $profile?->preferred_locale);
+    }
+
+    public function test_usernames_must_be_unique_and_preferences_valid()
+    {
+        $taken = $this->playerUser();
+        $player = $this->playerUser();
+
+        $this->actingAs($player)
+            ->patch(route('profile.update'), [
+                'name' => $player->name,
+                'email' => $player->email,
+                'username' => $taken->playerProfile?->username,
+                'country_code' => 'Mauritius',
+                'preferred_locale' => 'de',
+            ])
+            ->assertSessionHasErrors(['username', 'country_code', 'preferred_locale']);
+    }
+
+    public function test_the_profile_page_includes_player_preferences()
+    {
+        $player = $this->playerUser();
+
+        $this->actingAs($player)
+            ->get(route('profile.edit'))
+            ->assertInertia(fn (Assert $page) => $page
+                ->where('playerProfile.username', $player->playerProfile?->username));
     }
 }

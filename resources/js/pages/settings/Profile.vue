@@ -23,6 +23,28 @@ defineOptions({
     },
 });
 
+defineProps<{
+    playerProfile: {
+        username: string;
+        country_code: string | null;
+        preferred_locale: string;
+    } | null;
+}>();
+
+// Common countries for LuxBet players; anything else can be left blank.
+const countries: { code: string; name: string }[] = [
+    { code: 'MU', name: 'Mauritius' },
+    { code: 'KE', name: 'Kenya' },
+    { code: 'ZA', name: 'South Africa' },
+    { code: 'RE', name: 'Réunion' },
+    { code: 'MG', name: 'Madagascar' },
+    { code: 'SC', name: 'Seychelles' },
+    { code: 'IN', name: 'India' },
+    { code: 'FR', name: 'France' },
+    { code: 'GB', name: 'United Kingdom' },
+    { code: 'US', name: 'United States' },
+];
+
 const page = usePage();
 const user = computed(() => page.props.auth.user);
 </script>
@@ -36,7 +58,7 @@ const user = computed(() => page.props.auth.user);
         <Heading
             variant="small"
             title="Profile"
-            description="Update your name and email address"
+            description="Update your name, username, email and preferences"
         />
 
         <Form
@@ -57,6 +79,62 @@ const user = computed(() => page.props.auth.user);
                 />
                 <InputError class="mt-2" :message="errors.name" />
             </div>
+
+            <template v-if="playerProfile">
+                <div class="grid gap-2">
+                    <Label for="username">Username</Label>
+                    <Input
+                        id="username"
+                        class="mt-1 block w-full"
+                        name="username"
+                        :default-value="playerProfile.username"
+                        required
+                        autocomplete="nickname"
+                    />
+                    <InputError class="mt-2" :message="errors.username" />
+                </div>
+
+                <div class="grid gap-4 sm:grid-cols-2">
+                    <div class="grid gap-2">
+                        <Label for="country_code">Country (optional)</Label>
+                        <select
+                            id="country_code"
+                            name="country_code"
+                            class="mt-1 h-9 rounded-md border border-input bg-background px-3 text-sm"
+                            :value="playerProfile.country_code ?? ''"
+                        >
+                            <option value="">Prefer not to say</option>
+                            <option
+                                v-for="country in countries"
+                                :key="country.code"
+                                :value="country.code"
+                            >
+                                {{ country.name }}
+                            </option>
+                        </select>
+                        <InputError
+                            class="mt-2"
+                            :message="errors.country_code"
+                        />
+                    </div>
+                    <div class="grid gap-2">
+                        <Label for="preferred_locale">Language</Label>
+                        <select
+                            id="preferred_locale"
+                            name="preferred_locale"
+                            class="mt-1 h-9 rounded-md border border-input bg-background px-3 text-sm"
+                            :value="playerProfile.preferred_locale"
+                        >
+                            <option value="en">English</option>
+                            <option value="fr">Français</option>
+                        </select>
+                        <InputError
+                            class="mt-2"
+                            :message="errors.preferred_locale"
+                        />
+                    </div>
+                </div>
+            </template>
 
             <div class="grid gap-2">
                 <Label for="email">Email address</Label>

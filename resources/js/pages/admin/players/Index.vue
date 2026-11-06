@@ -140,7 +140,11 @@ function formatDate(value: string | null): string {
                     <template v-for="player in players.data" :key="player.id">
                         <tr class="border-t border-border">
                             <td class="px-4 py-3 font-semibold">
-                                {{ player.username ?? '—' }}
+                                <Link
+                                    :href="`/admin/players/${player.id}`"
+                                    class="underline-offset-4 hover:underline"
+                                    >{{ player.username ?? '—' }}</Link
+                                >
                             </td>
                             <td class="px-4 py-3">
                                 {{ player.email }}

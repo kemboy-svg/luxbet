@@ -6,6 +6,7 @@ use App\Domain\Games\Catalogue\GameCatalogue;
 use App\Domain\Games\Enums\GameCategory;
 use App\Domain\Games\Models\Game;
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
@@ -37,14 +38,17 @@ class GameController extends Controller
         ]);
     }
 
-    public function show(string $slug, GameCatalogue $catalogue): Response
+    public function show(Request $request, string $slug, GameCatalogue $catalogue): Response
     {
         $game = $catalogue->findListed($slug);
 
         abort_if($game === null, 404);
 
+        $user = $request->user();
+
         return Inertia::render('games/Show', [
             'game' => $catalogue->present($game),
+            'isFavourite' => $user instanceof User && $user->favouriteGames()->whereKey($game->id)->exists(),
             'related' => $catalogue->browse($game->category, null, 5)
                 ->getCollection()
                 ->reject(fn (Game $other): bool => $other->is($game))

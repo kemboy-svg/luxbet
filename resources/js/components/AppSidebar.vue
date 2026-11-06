@@ -1,11 +1,18 @@
 <script setup lang="ts">
 import { Link, usePage } from '@inertiajs/vue3';
 import {
+    Activity,
+    Coins,
     Gamepad2,
+    Heart,
+    History,
     LayoutGrid,
     LockKeyhole,
+    Radio,
+    ScrollText,
     Server,
     ShieldCheck,
+    UserCog,
     Users,
     Wallet,
 } from '@lucide/vue';
@@ -35,6 +42,16 @@ const mainNavItems: NavItem[] = [
         title: 'Games',
         href: '/games',
         icon: Gamepad2,
+    },
+    {
+        title: 'Favourites',
+        href: '/favourites',
+        icon: Heart,
+    },
+    {
+        title: 'Play history',
+        href: '/play-history',
+        icon: History,
     },
     {
         title: 'Demo wallet',
@@ -72,6 +89,42 @@ const adminNavItems = computed<NavItem[]>(() => {
             href: '/admin/providers',
             icon: Server,
         });
+    }
+
+    if (permissions.includes('providers.view')) {
+        items.push({
+            title: 'Provider events',
+            href: '/admin/provider-events',
+            icon: Radio,
+        });
+    }
+
+    if (permissions.includes('demo_wallet.view')) {
+        items.push({
+            title: 'Demo ledger',
+            href: '/admin/demo-transactions',
+            icon: Coins,
+        });
+    }
+
+    if (permissions.includes('audit.view')) {
+        items.push({
+            title: 'Audit log',
+            href: '/admin/audit-log',
+            icon: ScrollText,
+        });
+    }
+
+    if (permissions.includes('reports.view')) {
+        items.push({
+            title: 'System health',
+            href: '/admin/system-health',
+            icon: Activity,
+        });
+    }
+
+    if (permissions.includes('staff.manage')) {
+        items.push({ title: 'Staff', href: '/admin/staff', icon: UserCog });
     }
 
     if (permissions.includes('launch_gate.view')) {

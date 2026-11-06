@@ -5,6 +5,8 @@ export type EnvironmentMode = 'demo' | 'staging' | 'production';
  * the server is the enforcement layer for the real-money launch gate.
  */
 export type LuxBetSharedProps = {
+    /** Session reminder interval in minutes; null when switched off. */
+    reminderMinutes: number | null;
     environmentMode: EnvironmentMode;
     realMoneyEnabled: boolean;
     demoNotice: {
@@ -48,4 +50,17 @@ export type CatalogueGame = {
     playable: boolean;
     demo_only: true;
     provider: { name: string; is_simulator: boolean };
+};
+
+/** One demo session as summarised on the dashboard and play history. */
+export type PlaySessionSummary = {
+    reference: string;
+    game: { slug: string; name: string };
+    status: 'created' | 'launched' | 'completed' | 'expired' | 'failed';
+    started_at: string | null;
+    ended_at: string | null;
+    rounds: number;
+    staked: number;
+    won: number;
+    net: number;
 };
