@@ -2,9 +2,11 @@
 
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\DemoWalletAdjustmentController;
+use App\Http\Controllers\Admin\GameController;
 use App\Http\Controllers\Admin\LaunchControlController;
 use App\Http\Controllers\Admin\PlayerController;
 use App\Http\Controllers\Admin\PlayerStatusController;
+use App\Http\Controllers\Admin\ProviderController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -35,6 +37,24 @@ Route::post('players/{player}/demo-wallet/adjustments', DemoWalletAdjustmentCont
     ->whereUuid('player')
     ->middleware('throttle:30,1')
     ->name('players.demo-wallet.adjustments.store');
+
+Route::get('games', [GameController::class, 'index'])
+    ->middleware('can:games.view')
+    ->name('games.index');
+
+Route::patch('games/{game:id}', [GameController::class, 'update'])
+    ->whereUuid('game')
+    ->middleware('throttle:60,1')
+    ->name('games.update');
+
+Route::get('providers', [ProviderController::class, 'index'])
+    ->middleware('can:providers.view')
+    ->name('providers.index');
+
+Route::patch('providers/{provider}/status', [ProviderController::class, 'updateStatus'])
+    ->whereUuid('provider')
+    ->middleware('throttle:30,1')
+    ->name('providers.status.update');
 
 Route::get('launch-control', LaunchControlController::class)
     ->middleware('can:launch_gate.view')
