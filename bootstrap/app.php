@@ -9,6 +9,7 @@ use App\Http\Middleware\EnsureRealMoneyEnabled;
 use App\Http\Middleware\EnsureStaffHasTwoFactor;
 use App\Http\Middleware\HandleAppearance;
 use App\Http\Middleware\HandleInertiaRequests;
+use App\Http\Middleware\SetSecurityHeaders;
 use App\Http\Middleware\ThrottleRegistration;
 use App\Support\Api\ApiResponse;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -41,6 +42,7 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->prepend(AssignRequestId::class);
+        $middleware->append(SetSecurityHeaders::class);
 
         $middleware->encryptCookies(except: ['appearance', 'sidebar_state']);
 
@@ -100,7 +102,11 @@ return Application::configure(basePath: dirname(__DIR__))
                 $e instanceof AuthorizationException, $e instanceof AccessDeniedHttpException => ApiResponse::error(
                     'FORBIDDEN', 'You are not allowed to perform this action.', 403,
                 ),
-                $e instanceof ModelNotFoundException, $e instanceof NotFoundHttpException => ApiResponse::error(
+                // Policies that deny "as not found" reach here as a plain 404
+                // HttpException once Laravel has prepared the exception.
+                $e instanceof ModelNotFoundException,
+                $e instanceof NotFoundHttpException,
+                $e instanceof HttpExceptionInterface && $e->getStatusCode() === 404 => ApiResponse::error(
                     'NOT_FOUND', 'The requested resource was not found.', 404,
                 ),
                 $e instanceof MethodNotAllowedHttpException => ApiResponse::error(

@@ -210,7 +210,7 @@ class LaunchGate
     {
         try {
             return $record?->version;
-        } catch (Throwable) {
+        } catch (Throwable) { // @phpstan-ignore catch.neverThrown (casting a corrupt row can throw; the gate must still fail closed)
             return null;
         }
     }
@@ -219,7 +219,7 @@ class LaunchGate
     {
         try {
             return $record?->review_due_at;
-        } catch (Throwable) {
+        } catch (Throwable) { // @phpstan-ignore catch.neverThrown (as above)
             return null;
         }
     }

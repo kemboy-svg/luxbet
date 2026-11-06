@@ -39,6 +39,26 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Security headers
+    |--------------------------------------------------------------------------
+    |
+    | Applied by App\Http\Middleware\SetSecurityHeaders. HSTS is only sent
+    | over HTTPS. Set LUXBET_CSP_REPORT_ONLY=true to trial a policy change
+    | without blocking anything.
+    |
+    */
+
+    'security' => [
+        'hsts_max_age' => (int) env('LUXBET_HSTS_MAX_AGE', 31536000),
+        'csp' => [
+            'enabled' => (bool) env('LUXBET_CSP_ENABLED', true),
+            'report_only' => (bool) env('LUXBET_CSP_REPORT_ONLY', false),
+            'upgrade_insecure_requests' => (bool) env('LUXBET_CSP_UPGRADE_INSECURE', false),
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Email verification
     |--------------------------------------------------------------------------
     |

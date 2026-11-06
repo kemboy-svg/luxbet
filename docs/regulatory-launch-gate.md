@@ -13,12 +13,12 @@ The gate fails closed. It reports "enabled" only when **every** condition
 holds; anything missing, malformed, expired, unreadable or inconsistent keeps
 it disabled. In this release four independent locks keep it off:
 
-| Layer | Where | What it does |
-| --- | --- | --- |
-| Configuration | `config/luxbet.php` → `real_money.enabled` | A literal `false`. Not read from the environment, so there is no `.env` bypass. |
-| Database | `launch_control_real_money_locked` check constraint | PostgreSQL refuses any row with `real_money_enabled = true`. |
-| Model | `App\Domain\Compliance\Models\LaunchControl` | Saving with `real_money_enabled = true`, or deleting the record, throws `RealMoneyLockedException`. Nothing is mass assignable. |
-| Workflow | `LaunchGate::REASON_MULTI_PERSON_WORKFLOW_MISSING` | The multi-person approval workflow does not exist yet, so the gate always has at least this blocking reason. |
+| Layer         | Where                                               | What it does                                                                                                                    |
+| ------------- | --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| Configuration | `config/luxbet.php` → `real_money.enabled`          | A literal `false`. Not read from the environment, so there is no `.env` bypass.                                                 |
+| Database      | `launch_control_real_money_locked` check constraint | PostgreSQL refuses any row with `real_money_enabled = true`.                                                                    |
+| Model         | `App\Domain\Compliance\Models\LaunchControl`        | Saving with `real_money_enabled = true`, or deleting the record, throws `RealMoneyLockedException`. Nothing is mass assignable. |
+| Workflow      | `LaunchGate::REASON_MULTI_PERSON_WORKFLOW_MISSING`  | The multi-person approval workflow does not exist yet, so the gate always has at least this blocking reason.                    |
 
 `App\Domain\Compliance\LaunchGate\LaunchGate` is the single enforcement
 point. Every backend action that could ever touch real money must check it,

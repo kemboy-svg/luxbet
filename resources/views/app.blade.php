@@ -5,7 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
         {{-- Background matches the LuxBet theme in app.css to avoid a white flash --}}
-        <style>
+        <style nonce="{{ Vite::cspNonce() }}">
             html {
                 background-color: #12081f;
             }

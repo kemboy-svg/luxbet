@@ -82,6 +82,7 @@ composer test          # Pint (style), Larastan (static analysis), PHPUnit
 npm run check          # lint and formatting
 npm run types:check    # vue-tsc
 php artisan luxbet:launch-gate   # read-only real-money gate status
+php artisan luxbet:preflight --allow-local   # deployment safety checks
 ```
 
 Tests run against a PostgreSQL database named `luxbet_testing` (created
@@ -89,15 +90,15 @@ automatically by the Docker stack). See [docs/testing.md](docs/testing.md).
 
 ## Documentation
 
-| Document | Topic |
-| --- | --- |
-| [docs/architecture.md](docs/architecture.md) | Modular monolith, modules, request flow |
-| [docs/regulatory-launch-gate.md](docs/regulatory-launch-gate.md) | How real money stays disabled |
-| [docs/demo-mode.md](docs/demo-mode.md) | What demo mode means for users and code |
-| [docs/api-contracts.md](docs/api-contracts.md) | `/api/v1` envelopes and endpoints |
-| [docs/database-schema.md](docs/database-schema.md) | Tables and constraints |
-| [docs/provider-integration.md](docs/provider-integration.md) | Game-provider adapters |
-| [docs/security.md](docs/security.md) | Security controls |
-| [docs/testing.md](docs/testing.md) | Running and writing tests |
-| [docs/deployment.md](docs/deployment.md) | Environments and deployment |
-| [docs/decisions/](docs/decisions/) | Architecture decision records |
+| Document                                                         | Topic                                   |
+| ---------------------------------------------------------------- | --------------------------------------- |
+| [docs/architecture.md](docs/architecture.md)                     | Modular monolith, modules, request flow |
+| [docs/regulatory-launch-gate.md](docs/regulatory-launch-gate.md) | How real money stays disabled           |
+| [docs/demo-mode.md](docs/demo-mode.md)                           | What demo mode means for users and code |
+| [docs/api-contracts.md](docs/api-contracts.md)                   | `/api/v1` envelopes and endpoints       |
+| [docs/database-schema.md](docs/database-schema.md)               | Tables and constraints                  |
+| [docs/provider-integration.md](docs/provider-integration.md)     | Game-provider adapters                  |
+| [docs/security.md](docs/security.md)                             | Security controls                       |
+| [docs/testing.md](docs/testing.md)                               | Running and writing tests               |
+| [docs/deployment.md](docs/deployment.md)                         | Environments and deployment             |
+| [docs/decisions/](docs/decisions/)                               | Architecture decision records           |

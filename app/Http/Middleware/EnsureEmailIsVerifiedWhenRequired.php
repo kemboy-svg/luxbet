@@ -21,7 +21,9 @@ class EnsureEmailIsVerifiedWhenRequired extends EnsureEmailIsVerified
     public function handle($request, Closure $next, $redirectToRoute = null): mixed
     {
         if (! config('luxbet.require_email_verification')) {
-            return $next($request);
+            // The parent's docblock narrows the return type more than the
+            // pipeline allows; any Response from $next is valid here.
+            return $next($request); // @phpstan-ignore return.type
         }
 
         return parent::handle($request, $next, $redirectToRoute);
