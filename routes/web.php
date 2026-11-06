@@ -2,9 +2,11 @@
 
 use App\Http\Controllers\Games\GameController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\Player\DashboardController;
 use App\Http\Controllers\Player\DemoWalletController;
 use App\Http\Controllers\Player\FavouriteController;
 use App\Http\Controllers\Player\PlayController;
+use App\Http\Controllers\Player\SessionHistoryController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', HomeController::class)->name('home');
@@ -15,7 +17,9 @@ Route::get('games/{slug}', [GameController::class, 'show'])
     ->name('games.show');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::inertia('dashboard', 'Dashboard')->name('dashboard');
+    Route::get('dashboard', DashboardController::class)->name('dashboard');
+    Route::get('favourites', [FavouriteController::class, 'index'])->name('favourites.index');
+    Route::get('play-history', SessionHistoryController::class)->name('play-history.index');
 
     Route::get('demo-wallet', [DemoWalletController::class, 'show'])->name('demo-wallet.show');
     Route::post('demo-wallet/reset', [DemoWalletController::class, 'reset'])

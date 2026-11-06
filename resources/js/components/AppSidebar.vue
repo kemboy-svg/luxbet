@@ -2,6 +2,8 @@
 import { Link, usePage } from '@inertiajs/vue3';
 import {
     Gamepad2,
+    Heart,
+    History,
     LayoutGrid,
     LockKeyhole,
     Server,
@@ -35,6 +37,16 @@ const mainNavItems: NavItem[] = [
         title: 'Games',
         href: '/games',
         icon: Gamepad2,
+    },
+    {
+        title: 'Favourites',
+        href: '/favourites',
+        icon: Heart,
+    },
+    {
+        title: 'Play history',
+        href: '/play-history',
+        icon: History,
     },
     {
         title: 'Demo wallet',

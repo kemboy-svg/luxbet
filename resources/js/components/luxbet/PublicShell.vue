@@ -242,7 +242,7 @@ const trustPoints = [
                 <Gamepad2 class="size-[22px]" aria-hidden="true" />Games
             </Link>
             <Link
-                :href="signedIn ? dashboard() : login()"
+                :href="signedIn ? '/favourites' : login()"
                 class="flex min-h-13 flex-col items-center justify-center gap-0.5 text-[11px] font-semibold text-plum-200"
             >
                 <Heart class="size-[22px]" aria-hidden="true" />Favourites
