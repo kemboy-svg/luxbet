@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\V1\DemoWalletController;
+use App\Http\Controllers\Api\V1\GameController;
 use App\Http\Controllers\Api\V1\HealthController;
 use Illuminate\Support\Facades\Route;
 
@@ -17,6 +18,12 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware('throttle:api')->group(function () {
     Route::get('health', HealthController::class)->name('api.v1.health');
+
+    Route::get('games', [GameController::class, 'index'])->name('api.v1.games.index');
+    Route::get('games/categories', [GameController::class, 'categories'])->name('api.v1.games.categories');
+    Route::get('games/{slug}', [GameController::class, 'show'])
+        ->where('slug', '[a-z0-9]+(?:-[a-z0-9]+)*')
+        ->name('api.v1.games.show');
 });
 
 // Browser-session API: secure HTTP-only cookies, CSRF on state changes.

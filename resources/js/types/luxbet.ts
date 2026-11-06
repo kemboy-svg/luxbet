@@ -21,19 +21,31 @@ export type GameCategory =
     | 'poker'
     | 'crash';
 
-export type ShowcaseCategory = {
+export type CatalogueCategory = {
     id: GameCategory;
     name: string;
-    /** False until a provider integration for the category is tested. */
+    /** True only when at least one game in it can be launched in demo mode. */
     available: boolean;
+    playable_games: number;
 };
 
-export type ShowcaseGame = {
-    title: string;
-    subtitle: string;
+export type CatalogueGameStatus =
+    | 'playable'
+    | 'demo_not_offered'
+    | 'coming_soon';
+
+export type CatalogueGame = {
+    slug: string;
+    name: string;
     category: GameCategory;
-    available: boolean;
+    category_label: string;
+    description: string | null;
+    tile_title: string;
     /** CSS background for the tile artwork. */
     background: string;
     border: string;
+    status: CatalogueGameStatus;
+    playable: boolean;
+    demo_only: true;
+    provider: { name: string; is_simulator: boolean };
 };

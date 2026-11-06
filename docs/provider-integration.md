@@ -1,7 +1,15 @@
 # Game-provider integration
 
-Status: **not started** (Milestones 4–5). No provider has been selected and
-no official provider documentation has been supplied yet.
+Status: **catalogue in place (Milestone 4); launching and callbacks next
+(Milestone 5).** No real provider has been selected and no official provider
+documentation has been supplied yet.
+
+The **local simulator** provider and its ten fictional games are created by
+`Database\Seeders\LocalSimulatorCatalogueSeeder` (run by `php artisan
+db:seed`). They are always labelled "Local simulator — not a certified casino
+game". Staff with `providers.manage` can switch a provider between `sandbox`,
+`suspended` and `inactive`; `active` and the production environment cannot be
+selected in the demo release.
 
 ## Approach
 

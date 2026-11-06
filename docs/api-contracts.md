@@ -69,6 +69,41 @@ checks pass, `503` otherwise.
 
 Laravel's own `/up` liveness check is also available.
 
+### `GET /api/v1/games`
+
+Public catalogue. Query: `category`, `search` (name, max 100 chars),
+`per_page` (1–100, default 24). Each game:
+
+```json
+{
+  "slug": "candy-crown",
+  "name": "Candy Crown",
+  "category": "slots",
+  "category_label": "Slots",
+  "description": "…",
+  "tile_title": "Candy\nCrown",
+  "background": "radial-gradient(…)",
+  "border": "#FF9AD5",
+  "status": "playable",
+  "playable": true,
+  "demo_only": true,
+  "provider": { "name": "Local simulator", "is_simulator": true }
+}
+```
+
+`status` is `playable`, `demo_not_offered` (the provider has no demo) or
+`coming_soon` (the category has no approved integration yet). Responses never
+include provider URLs, credentials, secret references or internal game codes.
+
+### `GET /api/v1/games/categories`
+
+All six categories with `available` (true only when a game in it is playable)
+and `playable_games`.
+
+### `GET /api/v1/games/{slug}`
+
+One listed game; disabled or unknown games return `404 NOT_FOUND`.
+
 ### Session-authenticated endpoints
 
 These use the browser's existing session cookie (HTTP-only, SameSite=lax)

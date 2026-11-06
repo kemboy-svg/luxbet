@@ -15,9 +15,10 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        $this->call(LocalSimulatorCatalogueSeeder::class);
 
-        User::factory()->create([
+        // A fictional local player: test@example.com / password
+        User::factory()->player()->create([
             'name' => 'Test User',
             'email' => 'test@example.com',
         ]);
