@@ -108,10 +108,28 @@ changed on the Staff screen (see Milestone 6 below).
 - Marketing emails are opt-in (off by default) and consent changes are
   audited.
 
+## In place (Milestone 7)
+
+- Security headers on every response (`SetSecurityHeaders`):
+  Content-Security-Policy with a per-request script nonce (no inline or
+  third-party scripts, `object-src 'none'`, `frame-ancestors 'self'`),
+  HSTS over HTTPS, `X-Frame-Options`, `X-Content-Type-Options`,
+  `Referrer-Policy`, `Permissions-Policy` (payment, camera, microphone,
+  geolocation off) and `Cross-Origin-Opener-Policy`.
+- `luxbet:preflight` blocks unsafe releases (see
+  [deployment.md](deployment.md)). It prints variable names only, never
+  values.
+- Route-table tests (`RouteInventoryTest`) and an
+  [access-control review](access-control-review.md).
+- CI is green and required: Pint, Larastan (level 7), PHPUnit on
+  PostgreSQL, lint, type checks, `composer audit` and `npm audit`.
+- Staging hardening: HTTPS-only, private database and Redis, non-root
+  containers, firewall, key-only SSH, encrypted backups with restore drills.
+
 ## Planned
 
-| Control                                                           | Milestone                 |
-| ----------------------------------------------------------------- | ------------------------- |
-| Outbound HTTP client with SSRF checks for a real provider adapter | when a provider is chosen |
-| Security headers and Content Security Policy at the app layer     | 7                         |
-| Penetration test and access-control review                        | 7                         |
+| Control                                                           | When                                     |
+| ----------------------------------------------------------------- | ---------------------------------------- |
+| Outbound HTTP client with SSRF checks for a real provider adapter | When a provider is chosen                |
+| Uptime monitoring and error tracking                              | Before production                        |
+| Independent penetration test                                      | Milestone 8 (commissioned, not self-run) |

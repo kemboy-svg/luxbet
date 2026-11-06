@@ -82,6 +82,7 @@ composer test          # Pint (style), Larastan (static analysis), PHPUnit
 npm run check          # lint and formatting
 npm run types:check    # vue-tsc
 php artisan luxbet:launch-gate   # read-only real-money gate status
+php artisan luxbet:preflight --allow-local   # deployment safety checks
 ```
 
 Tests run against a PostgreSQL database named `luxbet_testing` (created

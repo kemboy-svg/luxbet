@@ -43,5 +43,26 @@ CREATE DATABASE luxbet_testing OWNER luxbet;
 ## CI
 
 `.github/workflows/tests.yml` runs on pushes to `main` and on pull requests,
-with PostgreSQL 16 and Redis 7 service containers, plus a dependency-audit
-job (`composer audit`, `npm audit --audit-level=high`).
+with PostgreSQL 16 and Redis 7 service containers: formatting and lint
+(`vp check`), `vue-tsc`, Pint, Larastan and PHPUnit. A separate job runs the
+dependency audits (`composer audit`, `npm audit --audit-level=high`).
+`.github/workflows/staging.yml` builds the production images on every pull
+request, so a broken Dockerfile is caught before merging.
+
+**Keep CI green.** Do not merge a pull request with a failing check.
+Dependabot opens weekly update PRs for Actions, Docker, Composer and npm.
+
+## Security tests
+
+`tests/Feature/Security` covers:
+
+- `RouteInventoryTest`: the route table itself (admin protections, sign-in
+  for state changes, no real-money routes, staff management guards);
+- `SecurityHeadersTest`: CSP with a per-request nonce, HSTS over HTTPS only,
+  hardening headers on pages and the API;
+- `PreflightCommandTest`: the deployment preflight fails on payment
+  credentials, live secrets, debug mode and plain HTTP, and never prints
+  secret values.
+
+Launch-gate tests live in `tests/Unit/Compliance` and
+`tests/Feature/Compliance`.
