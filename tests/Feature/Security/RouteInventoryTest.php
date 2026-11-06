@@ -66,6 +66,8 @@ class RouteInventoryTest extends TestCase
 
     public function test_state_changing_routes_require_a_session_or_a_signature(): void
     {
+        $unprotected = [];
+
         foreach ($this->routes() as $route) {
             $methods = array_diff($route->methods(), ['GET', 'HEAD', 'OPTIONS']);
             if ($methods === []) {
@@ -79,8 +81,16 @@ class RouteInventoryTest extends TestCase
                 continue;
             }
 
-            $this->assertContains('auth', $route->gatherMiddleware(), "{$uri} changes state without requiring sign-in");
+            // `auth` or a guard-qualified form such as Fortify's `auth:web`.
+            $requiresSignIn = collect($route->gatherMiddleware())
+                ->contains(fn (mixed $m): bool => $m === 'auth' || (is_string($m) && str_starts_with($m, 'auth:')));
+
+            if (! $requiresSignIn) {
+                $unprotected[] = implode('|', $methods).' '.$uri;
+            }
         }
+
+        $this->assertSame([], $unprotected, 'These routes change state without requiring sign-in');
     }
 
     public function test_no_real_money_routes_exist(): void
