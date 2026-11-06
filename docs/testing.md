@@ -25,10 +25,10 @@ CREATE DATABASE luxbet_testing OWNER luxbet;
 
 ## Layout
 
-| Folder | Contents |
-| --- | --- |
-| `tests/Unit` | Pure rules, e.g. launch-gate evaluation |
-| `tests/Feature` | HTTP, database and console behaviour |
+| Folder              | Contents                                        |
+| ------------------- | ----------------------------------------------- |
+| `tests/Unit`        | Pure rules, e.g. launch-gate evaluation         |
+| `tests/Feature`     | HTTP, database and console behaviour            |
 | `tests/Integration` | Provider adapters with fakes (from Milestone 5) |
 
 ## Rules

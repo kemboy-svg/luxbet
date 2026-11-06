@@ -42,14 +42,14 @@ what is in place; later milestones extend it.
 
 ### Roles
 
-| Role | Permissions |
-| --- | --- |
-| `player` | none |
-| `support_agent` | admin.access, players.view |
+| Role                 | Permissions                                                                                                                 |
+| -------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| `player`             | none                                                                                                                        |
+| `support_agent`      | admin.access, players.view                                                                                                  |
 | `compliance_officer` | admin.access, players.view, players.suspend, compliance.view, compliance.review, audit.view, reports.view, launch_gate.view |
-| `game_manager` | admin.access, games.view, games.manage, providers.view, providers.manage |
-| `finance_viewer` | admin.access, demo_wallet.view, reports.view |
-| `super_admin` | all of the above except compliance.review, plus demo_wallet.adjust and staff.manage |
+| `game_manager`       | admin.access, games.view, games.manage, providers.view, providers.manage                                                    |
+| `finance_viewer`     | admin.access, demo_wallet.view, reports.view                                                                                |
+| `super_admin`        | all of the above except compliance.review, plus demo_wallet.adjust and staff.manage                                         |
 
 Roles are defined in `App\Domain\Identity\Authorization\Role`. There is no
 self-service way to become staff: staff accounts are created and their roles
@@ -88,14 +88,14 @@ changed on the Staff screen (see Milestone 6 below).
 
 - Staff management (`/admin/staff`) needs `staff.manage` and a password
   re-confirmation. Rules live in `ManageStaff` so they hold for any caller:
-  - staff accounts are separate from player accounts; a player account can
-    never be given a staff role, and the player role is never granted there;
-  - nobody can change their own roles;
-  - at least one `super_admin` always remains (checked under a row lock);
-  - new staff accounts get a random password and a reset link, never a
-    password chosen by someone else;
-  - every change is audited (`staff.created`, `staff.role_granted`,
-    `staff.role_revoked`) with a required reason.
+    - staff accounts are separate from player accounts; a player account can
+      never be given a staff role, and the player role is never granted there;
+    - nobody can change their own roles;
+    - at least one `super_admin` always remains (checked under a row lock);
+    - new staff accounts get a random password and a reset link, never a
+      password chosen by someone else;
+    - every change is audited (`staff.created`, `staff.role_granted`,
+      `staff.role_revoked`) with a required reason.
 - Read-only viewers, each behind its own permission: player detail
   (`players.view`; ledger needs `demo_wallet.view`, audit trail needs
   `audit.view`), demo ledger (`demo_wallet.view`), provider events
@@ -110,8 +110,8 @@ changed on the Staff screen (see Milestone 6 below).
 
 ## Planned
 
-| Control | Milestone |
-| --- | --- |
+| Control                                                           | Milestone                 |
+| ----------------------------------------------------------------- | ------------------------- |
 | Outbound HTTP client with SSRF checks for a real provider adapter | when a provider is chosen |
-| Security headers and Content Security Policy at the app layer | 7 |
-| Penetration test and access-control review | 7 |
+| Security headers and Content Security Policy at the app layer     | 7                         |
+| Penetration test and access-control review                        | 7                         |

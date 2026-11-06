@@ -7,15 +7,15 @@ justifies it.
 
 ## Stack
 
-| Layer | Choice |
-| --- | --- |
-| Backend | Laravel 13 on PHP 8.3+ |
-| Frontend | Vue 3 + Inertia 3, TypeScript, Tailwind CSS 4 |
-| Auth | Laravel Fortify (registration, email verification, 2FA, passkeys) |
-| Database | PostgreSQL 16 |
-| Cache, sessions, queues | Redis 7 (Horizon to be added with the first queued jobs) |
-| Tests | PHPUnit, Larastan, Pint; vue-tsc and Vite+ checks for the frontend |
-| Base | `laravel/vue-starter-kit` (see first commit) |
+| Layer                   | Choice                                                             |
+| ----------------------- | ------------------------------------------------------------------ |
+| Backend                 | Laravel 13 on PHP 8.3+                                             |
+| Frontend                | Vue 3 + Inertia 3, TypeScript, Tailwind CSS 4                      |
+| Auth                    | Laravel Fortify (registration, email verification, 2FA, passkeys)  |
+| Database                | PostgreSQL 16                                                      |
+| Cache, sessions, queues | Redis 7 (Horizon to be added with the first queued jobs)           |
+| Tests                   | PHPUnit, Larastan, Pint; vue-tsc and Vite+ checks for the frontend |
+| Base                    | `laravel/vue-starter-kit` (see first commit)                       |
 
 ## Request flow
 
@@ -34,15 +34,15 @@ Business logic lives in `app/Domain/<Module>`; HTTP concerns stay in
 `app/Http`. Controllers validate, authorise, call a domain service and return
 a response.
 
-| Module | Status |
-| --- | --- |
-| `Compliance` | Launch gate, launch-control record (Milestone 1) |
-| `Identity` | Roles, permissions, account status (Milestone 2) |
-| `Players` | Player profiles, registration, status changes (Milestone 2) |
-| `Audit` | Append-only audit log (Milestone 2) |
-| `DemoWallet` | Demo-credit wallets and append-only ledger, separate from any future cash ledger ([ADR-002](decisions/ADR-002-demo-wallet-separation.md)) (Milestone 3) |
-| `Games`, `GameProviders` | Milestones 4–5 |
-| `ResponsiblePlay`, `Administration` | Milestones 3–6 |
+| Module                              | Status                                                                                                                                                  |
+| ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Compliance`                        | Launch gate, launch-control record (Milestone 1)                                                                                                        |
+| `Identity`                          | Roles, permissions, account status (Milestone 2)                                                                                                        |
+| `Players`                           | Player profiles, registration, status changes (Milestone 2)                                                                                             |
+| `Audit`                             | Append-only audit log (Milestone 2)                                                                                                                     |
+| `DemoWallet`                        | Demo-credit wallets and append-only ledger, separate from any future cash ledger ([ADR-002](decisions/ADR-002-demo-wallet-separation.md)) (Milestone 3) |
+| `Games`, `GameProviders`            | Milestones 4–5                                                                                                                                          |
+| `ResponsiblePlay`, `Administration` | Milestones 3–6                                                                                                                                          |
 
 ## Routing
 

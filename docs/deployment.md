@@ -2,12 +2,12 @@
 
 ## Environments
 
-| Environment | `APP_ENV` | `LUXBET_ENVIRONMENT_MODE` | Notes |
-| --- | --- | --- | --- |
-| Local | `local` | `demo` | Docker Compose stack |
-| CI | `testing` | `demo` | GitHub Actions service containers |
-| Staging | `staging` | `staging` | Sandbox provider credentials only |
-| Production | `production` | `demo` until legally approved | Still demo-only |
+| Environment | `APP_ENV`    | `LUXBET_ENVIRONMENT_MODE`     | Notes                             |
+| ----------- | ------------ | ----------------------------- | --------------------------------- |
+| Local       | `local`      | `demo`                        | Docker Compose stack              |
+| CI          | `testing`    | `demo`                        | GitHub Actions service containers |
+| Staging     | `staging`    | `staging`                     | Sandbox provider credentials only |
+| Production  | `production` | `demo` until legally approved | Still demo-only                   |
 
 Each environment has its own credentials. Never use production credentials in
 local, CI, demo or staging environments, and never commit secrets.

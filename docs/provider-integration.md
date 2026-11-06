@@ -10,11 +10,11 @@ are never invented.
 
 `App\Domain\GameProviders\Contracts\GameProviderAdapter`:
 
-| Method | Purpose |
-| --- | --- |
-| `createDemoSession(GameSession, returnUrl)` | Ask the provider for a demo launch URL; throw `ProviderUnavailable` on downtime |
-| `verifyWebhook(GameProvider, body, headers)` | Check signature, timestamp and schema; return a `VerifiedProviderEvent` |
-| `health(GameProvider)` | Reachability for the admin Providers page |
+| Method                                       | Purpose                                                                         |
+| -------------------------------------------- | ------------------------------------------------------------------------------- |
+| `createDemoSession(GameSession, returnUrl)`  | Ask the provider for a demo launch URL; throw `ProviderUnavailable` on downtime |
+| `verifyWebhook(GameProvider, body, headers)` | Check signature, timestamp and schema; return a `VerifiedProviderEvent`         |
+| `health(GameProvider)`                       | Reachability for the admin Providers page                                       |
 
 Adapters are registered per provider slug in `config/luxbet.php`
 (`providers.adapters`). Only `local-simulator` exists.
@@ -76,7 +76,7 @@ table already supports that.
 
 ## Secrets
 
-`ProviderSecrets` resolves secret *references* from configuration
+`ProviderSecrets` resolves secret _references_ from configuration
 (`config/services.php` → `game_providers`), never from the database, and
 refuses to load production provider credentials unless
 `LUXBET_ENVIRONMENT_MODE=production`.
