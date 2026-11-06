@@ -1,0 +1,40 @@
+# Caddy obtains and renews the Let's Encrypt certificate for LUXBET_DOMAIN
+# automatically. Point the domain's DNS A record at the Droplet first.
+{
+	email {$ACME_EMAIL}
+	servers {
+		# Only trust X-Forwarded-* from a DigitalOcean Load Balancer if you add one.
+		trusted_proxies static private_ranges
+	}
+}
+
+{$LUXBET_DOMAIN} {
+	root * /var/www/html/public
+	encode zstd gzip
+
+	# Long cache for fingerprinted Vite assets.
+	@assets path /build/*
+	header @assets Cache-Control "public, max-age=31536000, immutable"
+
+	# Block dotfiles and PHP files other than the front controller.
+	@blocked {
+		path /.* *.env
+		not path /.well-known/*
+	}
+	respond @blocked 404
+
+	php_fastcgi app:9000 {
+		root /var/www/html/public
+	}
+	file_server
+
+	header {
+		-Server
+		-X-Powered-By
+	}
+
+	log {
+		output stdout
+		format json
+	}
+}

@@ -1,0 +1,100 @@
+name: staging
+
+# Builds the production images on every push to main and, when enabled,
+# deploys them to the DigitalOcean staging Droplet.
+#
+# Repository settings needed (Settings -> Secrets and variables -> Actions):
+#   variables: STAGING_DEPLOY_ENABLED = true, STAGING_HOST, STAGING_USER
+#   secrets:   STAGING_SSH_KEY (private key of the deploy user),
+#              STAGING_SSH_KNOWN_HOSTS (output of `ssh-keyscan <host>`)
+# See docs/runbooks/staging-setup.md.
+
+on:
+  push:
+    branches:
+      - main
+  # Pull requests build the images (no push, no deploy) to catch Dockerfile breakage.
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: 'Commit SHA to deploy (defaults to the latest main)'
+        required: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: staging
+  cancel-in-progress: false
+
+jobs:
+  images:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      tag: ${{ steps.tag.outputs.tag }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ inputs.ref || github.sha }}
+          persist-credentials: false
+
+      - name: Image tag
+        id: tag
+        run: echo "tag=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+      - name: Log in to GitHub Container Registry
+        if: github.event_name != 'pull_request'
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+
+      - name: Build and push images
+        env:
+          TAG: ${{ steps.tag.outputs.tag }}
+          PUSH: ${{ github.event_name != 'pull_request' }}
+        run: |
+          for target in app web; do
+            docker build -f deploy/docker/Dockerfile --target "$target" \
+              -t "ghcr.io/kemboy-svg/luxbet-$target:$TAG" .
+            if [ "$PUSH" = "true" ]; then
+              docker push "ghcr.io/kemboy-svg/luxbet-$target:$TAG"
+            fi
+          done
+
+  deploy:
+    needs: images
+    if: github.event_name != 'pull_request' && vars.STAGING_DEPLOY_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ needs.images.outputs.tag }}
+          persist-credentials: false
+
+      - name: Configure SSH
+        env:
+          SSH_KEY: ${{ secrets.STAGING_SSH_KEY }}
+          KNOWN_HOSTS: ${{ secrets.STAGING_SSH_KNOWN_HOSTS }}
+        run: |
+          install -d -m 700 ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/id_ed25519
+          printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/id_ed25519 ~/.ssh/known_hosts
+
+      - name: Copy compose file and scripts
+        env:
+          TARGET: ${{ vars.STAGING_USER }}@${{ vars.STAGING_HOST }}
+        run: |
+          scp deploy/compose.staging.yml "$TARGET:/opt/luxbet/compose.yml"
+          scp deploy/scripts/*.sh "$TARGET:/opt/luxbet/scripts/"
+
+      - name: Deploy
+        env:
+          TARGET: ${{ vars.STAGING_USER }}@${{ vars.STAGING_HOST }}
+          TAG: ${{ needs.images.outputs.tag }}
+        run: ssh "$TARGET" "chmod +x /opt/luxbet/scripts/*.sh && /opt/luxbet/scripts/deploy.sh $TAG"
