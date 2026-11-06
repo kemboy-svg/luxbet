@@ -107,12 +107,19 @@ class PreflightCommand extends Command
      */
     private function matchingEnvKeys(callable $matches): array
     {
-        $keys = array_unique([...array_keys(getenv()), ...array_keys($_ENV), ...array_keys($_SERVER)]);
+        // Read the process environment directly: env() returns null for
+        // anything not in config once the configuration is cached.
+        $values = [...$_SERVER, ...$_ENV, ...getenv()];
 
-        return array_values(array_filter(
-            array_map('strval', $keys),
-            fn (string $key): bool => $matches(strtoupper($key)) && filled(env($key)),
-        ));
+        $names = [];
+        foreach ($values as $key => $value) {
+            $key = (string) $key;
+            if (is_string($value) && trim($value) !== '' && $matches(strtoupper($key))) {
+                $names[] = $key;
+            }
+        }
+
+        return array_values(array_unique($names));
     }
 
     /**
