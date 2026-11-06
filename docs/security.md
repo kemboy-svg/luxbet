@@ -55,6 +55,20 @@ Roles are defined in `App\Domain\Identity\Authorization\Role`. Staff
 accounts are assigned roles with tinker or a future staff-management screen
 (`staff.manage`); there is no self-service way to become staff.
 
+## In place (Milestone 3)
+
+- Demo balances change only inside a database transaction with the wallet
+  row locked, so concurrent requests cannot corrupt them.
+- Idempotency keys stop repeated requests (double clicks, provider retries)
+  from applying twice; database unique constraints back this up.
+- Ledger and wallet rules enforced by PostgreSQL check constraints and an
+  append-only trigger, not only by application code.
+- Players can only see their own wallet; other wallets return 404 (no IDOR,
+  no existence leak). Staff reading wallets need `demo_wallet.view` and 2FA.
+- Session-based JSON API with CSRF protection on state changes.
+- Staff adjustments need `demo_wallet.adjust`, a reason and an idempotency
+  key; staff cannot adjust their own or a colleague's credits.
+
 ## Planned
 
 | Control | Milestone |

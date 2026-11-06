@@ -1,5 +1,6 @@
 <?php
 
+use App\Domain\DemoWallet\Exceptions\DemoWalletException;
 use App\Http\Middleware\AssignRequestId;
 use App\Http\Middleware\EnsureAccountIsActive;
 use App\Http\Middleware\EnsureRealMoneyEnabled;
@@ -10,13 +11,18 @@ use App\Http\Middleware\ThrottleRegistration;
 use App\Support\Api\ApiResponse;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\AuthenticationException;
+use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
+use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Foundation\Http\Middleware\ValidateCsrfToken;
 use Illuminate\Http\Exceptions\ThrottleRequestsException;
 use Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Middleware\SubstituteBindings;
+use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
@@ -44,6 +50,17 @@ return Application::configure(basePath: dirname(__DIR__))
             AddLinkHeadersForPreloadedAssets::class,
         ]);
 
+        // Session-authenticated JSON API for the browser (same cookies as the
+        // web app, CSRF-protected), without Inertia.
+        $middleware->group('api.session', [
+            EncryptCookies::class,
+            AddQueuedCookiesToResponse::class,
+            StartSession::class,
+            ValidateCsrfToken::class,
+            SubstituteBindings::class,
+            EnsureAccountIsActive::class,
+        ]);
+
         $middleware->alias([
             'real-money' => EnsureRealMoneyEnabled::class,
             'staff.mfa' => EnsureStaffHasTwoFactor::class,
@@ -62,8 +79,14 @@ return Application::configure(basePath: dirname(__DIR__))
             }
 
             return match (true) {
+                $e instanceof DemoWalletException => ApiResponse::error(
+                    'DEMO_WALLET_REFUSED', $e->getMessage(), 422,
+                ),
                 $e instanceof ValidationException => ApiResponse::error(
                     'VALIDATION_ERROR', 'The request could not be processed.', 422, $e->errors(),
+                ),
+                $e instanceof AuthorizationException && $e->status() === 404 => ApiResponse::error(
+                    'NOT_FOUND', 'The requested resource was not found.', 404,
                 ),
                 $e instanceof AuthenticationException => ApiResponse::error(
                     'UNAUTHENTICATED', 'Authentication is required.', 401,

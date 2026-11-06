@@ -20,6 +20,13 @@ cash would risk demo credits becoming convertible or being confused with money.
 - Any future regulated cash ledger is a separate, double-entry module built
   only after legal approval (instructions.md §5.2).
 
+## Implementation (Milestone 3)
+
+Wallets use the ISO 4217 code `XXX` ("no currency") with no minor unit, so
+one stored unit is one demo credit and no balance can be read as MUR, USD,
+EUR or KES. The ledger is append-only at the database level and checks that
+every row's balances agree with its direction.
+
 ## Consequences
 
 - No code path can turn demo credits into money.

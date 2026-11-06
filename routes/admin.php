@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\DemoWalletAdjustmentController;
 use App\Http\Controllers\Admin\LaunchControlController;
 use App\Http\Controllers\Admin\PlayerController;
 use App\Http\Controllers\Admin\PlayerStatusController;
@@ -29,6 +30,11 @@ Route::patch('players/{player}/status', PlayerStatusController::class)
     ->whereUuid('player')
     ->middleware('throttle:30,1')
     ->name('players.status.update');
+
+Route::post('players/{player}/demo-wallet/adjustments', DemoWalletAdjustmentController::class)
+    ->whereUuid('player')
+    ->middleware('throttle:30,1')
+    ->name('players.demo-wallet.adjustments.store');
 
 Route::get('launch-control', LaunchControlController::class)
     ->middleware('can:launch_gate.view')

@@ -54,6 +54,10 @@ class RegistrationTest extends TestCase
         $this->assertNull($profile->date_of_birth);
 
         $this->assertDatabaseHas('audit_logs', ['action' => 'player.registered', 'subject_id' => $user->id]);
+
+        $wallet = $user->demoWallets()->sole();
+        $this->assertSame('XXX', $wallet->currency_code);
+        $this->assertSame(config('luxbet.demo_wallet.initial_allowance'), $wallet->balance_minor);
     }
 
     public function test_age_confirmation_and_terms_acceptance_are_required()

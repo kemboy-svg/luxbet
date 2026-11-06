@@ -37,6 +37,26 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Demo wallet
+    |--------------------------------------------------------------------------
+    |
+    | Demo credits are abstract units with no monetary value. Wallets use the
+    | ISO 4217 "no currency" code XXX, with no minor unit, so one stored unit
+    | is one demo credit. Credits can never be bought, transferred,
+    | withdrawn, redeemed or converted.
+    |
+    */
+
+    'demo_wallet' => [
+        'currency' => 'XXX',
+        'initial_allowance' => 10_000,
+        // Upper bound for a single ledger entry, as a guard against bad input.
+        'max_transaction' => 1_000_000,
+        'max_admin_adjustment' => 100_000,
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Terms of demo use
     |--------------------------------------------------------------------------
     |

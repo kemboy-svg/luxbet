@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Domain\DemoWallet\Models\DemoWallet;
 use App\Domain\Identity\Authorization\Role;
 use App\Domain\Identity\Enums\UserStatus;
 use App\Domain\Players\Models\PlayerProfile;
@@ -9,8 +10,10 @@ use Database\Factories\UserFactory;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -34,6 +37,7 @@ use Spatie\Permission\Traits\HasRoles;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property-read PlayerProfile|null $playerProfile
+ * @property-read Collection<int, DemoWallet> $demoWallets
  */
 #[Fillable(['name', 'email', 'password'])]
 #[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token', 'roles', 'permissions'])]
@@ -73,6 +77,14 @@ class User extends Authenticatable implements MustVerifyEmail, PasskeyUser
     public function playerProfile(): HasOne
     {
         return $this->hasOne(PlayerProfile::class);
+    }
+
+    /**
+     * @return HasMany<DemoWallet, $this>
+     */
+    public function demoWallets(): HasMany
+    {
+        return $this->hasMany(DemoWallet::class);
     }
 
     public function isActive(): bool
