@@ -3,6 +3,7 @@
 use App\Http\Controllers\Games\GameController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Player\DemoWalletController;
+use App\Http\Controllers\Player\PlayController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', HomeController::class)->name('home');
@@ -19,6 +20,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('demo-wallet/reset', [DemoWalletController::class, 'reset'])
         ->middleware('throttle:10,1')
         ->name('demo-wallet.reset');
+
+    Route::post('games/{slug}/play', [PlayController::class, 'start'])
+        ->where('slug', '[a-z0-9]+(?:-[a-z0-9]+)*')
+        ->middleware('throttle:20,1')
+        ->name('games.play');
+
+    // Local simulator game screen: only reachable through the signed launch URL.
+    Route::get('play/{session}', [PlayController::class, 'show'])
+        ->middleware('signed')
+        ->name('simulator.play');
+
+    Route::post('play/{session}/end', [PlayController::class, 'end'])->name('simulator.end');
 });
 
 require __DIR__.'/settings.php';

@@ -1,6 +1,7 @@
 <?php
 
 use App\Domain\DemoWallet\Exceptions\DemoWalletException;
+use App\Domain\GameProviders\Exceptions\DemoSessionRefused;
 use App\Http\Middleware\AssignRequestId;
 use App\Http\Middleware\EnsureAccountIsActive;
 use App\Http\Middleware\EnsureEmailIsVerifiedWhenRequired;
@@ -81,6 +82,9 @@ return Application::configure(basePath: dirname(__DIR__))
             }
 
             return match (true) {
+                $e instanceof DemoSessionRefused => ApiResponse::error(
+                    'DEMO_SESSION_REFUSED', $e->getMessage(), 422,
+                ),
                 $e instanceof DemoWalletException => ApiResponse::error(
                     'DEMO_WALLET_REFUSED', $e->getMessage(), 422,
                 ),

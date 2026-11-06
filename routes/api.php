@@ -2,7 +2,9 @@
 
 use App\Http\Controllers\Api\V1\DemoWalletController;
 use App\Http\Controllers\Api\V1\GameController;
+use App\Http\Controllers\Api\V1\GameSessionController;
 use App\Http\Controllers\Api\V1\HealthController;
+use App\Http\Controllers\Api\V1\ProviderWebhookController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -38,4 +40,21 @@ Route::middleware(['api.session', 'auth', 'verified', 'throttle:api'])->group(fu
         ->whereUuid('wallet')
         ->middleware('throttle:10,1')
         ->name('api.v1.demo-wallets.reset');
+
+    Route::post('games/{slug}/demo-session', [GameSessionController::class, 'store'])
+        ->where('slug', '[a-z0-9]+(?:-[a-z0-9]+)*')
+        ->middleware('throttle:20,1')
+        ->name('api.v1.games.demo-session');
+
+    Route::get('game-sessions', [GameSessionController::class, 'index'])->name('api.v1.game-sessions.index');
+    Route::get('game-sessions/{session}', [GameSessionController::class, 'show'])->name('api.v1.game-sessions.show');
+    Route::post('game-sessions/{session}/simulator-rounds', [GameSessionController::class, 'simulatorRound'])
+        ->middleware('throttle:60,1')
+        ->name('api.v1.game-sessions.simulator-rounds');
 });
+
+// Provider webhooks: no session or CSRF; authenticity comes from the
+// provider's signature, checked before anything is processed.
+Route::post('webhooks/providers/{provider:slug}', ProviderWebhookController::class)
+    ->middleware('throttle:600,1')
+    ->name('api.v1.webhooks.providers');

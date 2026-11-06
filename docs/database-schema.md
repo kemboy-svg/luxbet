@@ -176,6 +176,37 @@ A game is **listed** when it is enabled and its provider is `sandbox` or
 supports demo play in the `sandbox` environment. A category is available only
 when it has at least one playable game.
 
+## `game_sessions`
+
+| Column | Type | Notes |
+| --- | --- | --- |
+| `id` | uuid PK | |
+| `user_id`, `game_id`, `provider_id`, `demo_wallet_id` | uuid FKs | |
+| `session_reference` | varchar(64), unique | `gs_…`; used in URLs |
+| `provider_session_reference` | varchar, null, unique | |
+| `mode` | varchar | Check: always `demo` |
+| `status` | varchar | `created`, `launched`, `completed`, `expired`, `failed` |
+| `failure_reason` | varchar, null | |
+| `launched_at`, `expires_at`, `ended_at` | timestamptz | |
+
+## `provider_webhook_events`
+
+Receipt of each signature-verified provider event, stored before processing.
+Only a SHA-256 hash of the payload is kept, never the body.
+
+| Column | Type | Notes |
+| --- | --- | --- |
+| `id` | uuid PK | |
+| `provider_id` | uuid FK | |
+| `event_id` | varchar(128) | Unique with `provider_id` |
+| `event_type` | varchar | `demo.bet`, `demo.win`, `demo.refund` |
+| `payload_hash` | char(64) | |
+| `game_session_id` | uuid FK, null | |
+| `round_reference`, `amount` | | |
+| `processing_status` | varchar | `received`, `processed`, `rejected`, `failed` |
+| `failure_reason` | varchar, null | e.g. `refund_without_bet`, `session_closed` |
+| `received_at`, `processed_at` | timestamptz | |
+
 ## Planned tables
 
-`game_sessions`, `provider_webhook_events`, `responsible_play_settings`. See `instructions.md` §5.1.
+`responsible_play_settings`. See `instructions.md` §5.1.

@@ -170,5 +170,44 @@ limited to 10 per minute.
 There are no `/deposit`, `/withdraw`, `/cashout`, transfer, purchase or
 conversion endpoints, and there never will be in the demo release.
 
+### `POST /api/v1/games/{slug}/demo-session`
+
+Body: `{ "return_url": "https://…" }` (optional; must be this site's origin,
+otherwise `/games` is used). `201`:
+
+```json
+{
+  "data": {
+    "session_id": "gs_…",
+    "mode": "demo",
+    "launch_url": "https://…/play/gs_…?expires=…&return=…&signature=…",
+    "expires_at": "2026-11-09T18:30:00+00:00"
+  },
+  "meta": { "request_id": "uuid" }
+}
+```
+
+`422 DEMO_SESSION_REFUSED` when the game is not playable or the provider is
+down. Rate limited to 20 per minute.
+
+### `GET /api/v1/game-sessions`, `GET /api/v1/game-sessions/{session}`
+
+The signed-in player's sessions (another player's session returns `404`).
+
+### `POST /api/v1/game-sessions/{session}/simulator-rounds`
+
+Local simulator only. Body `{ "stake": 100 }` (one of 10, 50, 100, 250, 500).
+Returns `round_id`, `stake`, `payout`, `result` (`win`, `lose`, `push`),
+`display` (reels or cards) and the new `balance`. `422 DEMO_SESSION_REFUSED`
+for closed sessions, other stakes or not enough credits.
+
+### `POST /api/v1/webhooks/providers/{slug}`
+
+For providers, not browsers. No session or CSRF; authenticated by the
+provider's signature. Responses: `200 { status: processed | duplicate |
+rejected, reason, balance_after }`, `401 INVALID_SIGNATURE` /
+`STALE_WEBHOOK`, `413 PAYLOAD_TOO_LARGE`, `422 INVALID_PAYLOAD`, `404` for
+unknown providers. See [provider-integration.md](provider-integration.md).
+
 Endpoints for auth, games, webhooks and admin follow in later milestones as
 specified in `instructions.md` §9.

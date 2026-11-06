@@ -69,12 +69,26 @@ accounts are assigned roles with tinker or a future staff-management screen
 - Staff adjustments need `demo_wallet.adjust`, a reason and an idempotency
   key; staff cannot adjust their own or a colleague's credits.
 
+## In place (Milestone 5)
+
+- Provider webhooks: signature verified with a constant-time compare before
+  anything is stored; 5-minute replay window; 64 KB body limit; strict
+  schema; only demo event types; receipts unique per event ID.
+- Player, wallet and balance values in provider payloads are never trusted;
+  the wallet comes from our own session record.
+- Launch URLs restricted to allowlisted HTTPS hosts or this app's origin
+  (no arbitrary iframe or redirect targets); return URLs same-origin only.
+- The simulator game screen is reachable only through a signed, expiring URL
+  and only by the session's owner.
+- Production provider endpoints are never playable in demo mode, and
+  production provider credentials are never loaded outside production mode.
+- Provider secrets and URLs are hidden from every browser response.
+
 ## Planned
 
 | Control | Milestone |
 | --- | --- |
 | Staff management screen and audit log viewer | 6 |
-| Webhook signature verification, replay window, idempotency | 5 |
-| Outbound URL allowlists (SSRF), launch-URL and return-URL allowlists (open redirect) | 5 |
+| Outbound HTTP client with SSRF checks for a real provider adapter | when a provider is chosen |
 | Security headers and Content Security Policy at the app layer | 7 |
 | Penetration test and access-control review | 7 |
