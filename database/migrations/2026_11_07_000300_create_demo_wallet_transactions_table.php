@@ -53,7 +53,7 @@ return new class extends Migration
             SQL);
 
         DB::unprepared(<<<'SQL'
-            CREATE FUNCTION demo_wallet_transactions_block_mutation() RETURNS trigger AS $$
+            CREATE OR REPLACE FUNCTION demo_wallet_transactions_block_mutation() RETURNS trigger AS $$
             BEGIN
                 RAISE EXCEPTION 'demo_wallet_transactions is append-only';
             END;
