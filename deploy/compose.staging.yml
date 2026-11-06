@@ -9,84 +9,107 @@
 # selected with LUXBET_IMAGE_TAG (a git commit SHA).
 
 x-app: &app
-  image: ghcr.io/kemboy-svg/luxbet-app:${LUXBET_IMAGE_TAG:?set LUXBET_IMAGE_TAG}
-  env_file: .env
-  restart: unless-stopped
-  read_only: false
-  security_opt:
-    - no-new-privileges:true
-  volumes:
-    - app-storage:/var/www/html/storage/app
-    - app-logs:/var/www/html/storage/logs
-  depends_on:
-    pgsql:
-      condition: service_healthy
-    redis:
-      condition: service_healthy
+    image: ghcr.io/kemboy-svg/luxbet-app:${LUXBET_IMAGE_TAG:?set LUXBET_IMAGE_TAG}
+    env_file: .env
+    restart: unless-stopped
+    read_only: false
+    security_opt:
+        - no-new-privileges:true
+    volumes:
+        - app-storage:/var/www/html/storage/app
+        - app-logs:/var/www/html/storage/logs
+    depends_on:
+        pgsql:
+            condition: service_healthy
+        redis:
+            condition: service_healthy
 
 services:
-  app:
-    <<: *app
+    app:
+        <<: *app
 
-  queue:
-    <<: *app
-    command: ["php", "artisan", "queue:work", "--tries=3", "--max-time=3600", "--sleep=3"]
+    queue:
+        <<: *app
+        command:
+            [
+                'php',
+                'artisan',
+                'queue:work',
+                '--tries=3',
+                '--max-time=3600',
+                '--sleep=3',
+            ]
 
-  scheduler:
-    <<: *app
-    command: ["php", "artisan", "schedule:work"]
+    scheduler:
+        <<: *app
+        command: ['php', 'artisan', 'schedule:work']
 
-  web:
-    image: ghcr.io/kemboy-svg/luxbet-web:${LUXBET_IMAGE_TAG:?set LUXBET_IMAGE_TAG}
-    restart: unless-stopped
-    security_opt:
-      - no-new-privileges:true
-    ports:
-      - "80:80"
-      - "443:443"
-      - "443:443/udp"
-    environment:
-      LUXBET_DOMAIN: ${LUXBET_DOMAIN:?set LUXBET_DOMAIN}
-      ACME_EMAIL: ${ACME_EMAIL:?set ACME_EMAIL}
-    volumes:
-      - caddy-data:/data
-      - caddy-config:/config
-    depends_on:
-      - app
+    web:
+        image: ghcr.io/kemboy-svg/luxbet-web:${LUXBET_IMAGE_TAG:?set LUXBET_IMAGE_TAG}
+        restart: unless-stopped
+        security_opt:
+            - no-new-privileges:true
+        ports:
+            - '80:80'
+            - '443:443'
+            - '443:443/udp'
+        environment:
+            LUXBET_DOMAIN: ${LUXBET_DOMAIN:?set LUXBET_DOMAIN}
+            ACME_EMAIL: ${ACME_EMAIL:?set ACME_EMAIL}
+        volumes:
+            - caddy-data:/data
+            - caddy-config:/config
+        depends_on:
+            - app
 
-  pgsql:
-    image: postgres:16-alpine
-    restart: unless-stopped
-    environment:
-      POSTGRES_DB: ${DB_DATABASE:?set DB_DATABASE}
-      POSTGRES_USER: ${DB_USERNAME:?set DB_USERNAME}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:?set DB_PASSWORD}
-    volumes:
-      - pgsql-data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
-      interval: 5s
-      timeout: 5s
-      retries: 20
+    pgsql:
+        image: postgres:16-alpine
+        restart: unless-stopped
+        environment:
+            POSTGRES_DB: ${DB_DATABASE:?set DB_DATABASE}
+            POSTGRES_USER: ${DB_USERNAME:?set DB_USERNAME}
+            POSTGRES_PASSWORD: ${DB_PASSWORD:?set DB_PASSWORD}
+        volumes:
+            - pgsql-data:/var/lib/postgresql/data
+        healthcheck:
+            test:
+                [
+                    'CMD-SHELL',
+                    'pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}',
+                ]
+            interval: 5s
+            timeout: 5s
+            retries: 20
 
-  redis:
-    image: redis:7-alpine
-    restart: unless-stopped
-    command: ["redis-server", "--requirepass", "${REDIS_PASSWORD:?set REDIS_PASSWORD}", "--appendonly", "yes"]
-    volumes:
-      - redis-data:/data
-    healthcheck:
-      test: ["CMD-SHELL", "redis-cli -a \"$${REDIS_PASSWORD}\" --no-auth-warning ping"]
-      interval: 5s
-      timeout: 5s
-      retries: 20
-    environment:
-      REDIS_PASSWORD: ${REDIS_PASSWORD}
+    redis:
+        image: redis:7-alpine
+        restart: unless-stopped
+        command:
+            [
+                'redis-server',
+                '--requirepass',
+                '${REDIS_PASSWORD:?set REDIS_PASSWORD}',
+                '--appendonly',
+                'yes',
+            ]
+        volumes:
+            - redis-data:/data
+        healthcheck:
+            test:
+                [
+                    'CMD-SHELL',
+                    'redis-cli -a "$${REDIS_PASSWORD}" --no-auth-warning ping',
+                ]
+            interval: 5s
+            timeout: 5s
+            retries: 20
+        environment:
+            REDIS_PASSWORD: ${REDIS_PASSWORD}
 
 volumes:
-  app-storage:
-  app-logs:
-  caddy-data:
-  caddy-config:
-  pgsql-data:
-  redis-data:
+    app-storage:
+    app-logs:
+    caddy-data:
+    caddy-config:
+    pgsql-data:
+    redis-data:
