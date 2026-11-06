@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Head, Link, usePage } from '@inertiajs/vue3';
+import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
 import { ArrowLeft, Clock3, Play } from '@lucide/vue';
 import { computed } from 'vue';
 import GameTile from '@/components/luxbet/GameTile.vue';
@@ -14,6 +14,12 @@ const props = defineProps<{
 
 const page = usePage();
 const signedIn = computed(() => Boolean(page.props.auth.user));
+
+const playForm = useForm({});
+
+function play(): void {
+    playForm.post(`/games/${props.game.slug}/play`, { preserveScroll: true });
+}
 
 const providerLabel = computed(() =>
     props.game.provider.is_simulator
@@ -93,15 +99,27 @@ const providerLabel = computed(() =>
                         <template v-else>
                             <button
                                 type="button"
-                                disabled
-                                class="inline-flex cursor-not-allowed items-center justify-center gap-2 rounded-full bg-plum-600 px-8 py-3.5 text-lg font-bold text-plum-200"
+                                :disabled="playForm.processing"
+                                class="inline-flex items-center justify-center gap-2 rounded-full bg-linear-to-b from-gold-200 via-gold-500 to-gold-600 px-8 py-3.5 text-lg font-bold text-gold-900 shadow-[0_6px_24px_rgba(245,179,31,0.45)] disabled:opacity-60"
+                                @click="play"
                             >
                                 <Play class="size-5" aria-hidden="true" />
-                                Play demo
+                                {{
+                                    playForm.processing
+                                        ? 'Starting…'
+                                        : 'Play demo'
+                                }}
                             </button>
-                            <p class="text-sm text-plum-200">
-                                Game launching is being connected and will be
-                                available shortly.
+                            <p
+                                v-if="page.props.errors.play"
+                                role="alert"
+                                class="text-sm text-[#F4A79D]"
+                            >
+                                {{ page.props.errors.play }}
+                            </p>
+                            <p v-else class="text-sm text-plum-200">
+                                Starts a 30-minute demo session. Only demo
+                                credits are used.
                             </p>
                         </template>
                     </div>

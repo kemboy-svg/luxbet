@@ -18,6 +18,11 @@ type AdminProvider = {
     can_serve_demo: boolean;
     games_count: number;
     credentials_configured: boolean;
+    health: {
+        available: boolean;
+        latency_ms: number | null;
+        message: string | null;
+    };
 };
 
 defineProps<{
@@ -120,6 +125,28 @@ function save(provider: AdminProvider): void {
                         <dt class="text-muted-foreground">Games</dt>
                         <dd class="font-semibold">
                             {{ provider.games_count }}
+                        </dd>
+                    </div>
+                    <div class="col-span-2">
+                        <dt class="text-muted-foreground">Health</dt>
+                        <dd class="font-semibold">
+                            <span
+                                :class="
+                                    provider.health.available
+                                        ? 'text-[#8fd3f5]'
+                                        : 'text-[#f6c08a]'
+                                "
+                                >{{
+                                    provider.health.available
+                                        ? '● Reachable'
+                                        : '○ Unavailable'
+                                }}</span
+                            >
+                            <span
+                                v-if="provider.health.message"
+                                class="ml-1 font-normal text-muted-foreground"
+                                >— {{ provider.health.message }}</span
+                            >
                         </dd>
                     </div>
                     <div>

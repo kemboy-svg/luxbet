@@ -11,7 +11,9 @@ void createInertiaApp({
     title: (title) => (title ? `${title} - ${appName}` : appName),
     layout: (name) => {
         switch (true) {
+            // Public pages and the game screen bring their own frame.
             case name === 'Welcome':
+            case name.startsWith('games/'):
                 return null;
             case name.startsWith('auth/'):
                 return AuthLayout;
