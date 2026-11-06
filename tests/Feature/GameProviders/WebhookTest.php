@@ -169,7 +169,8 @@ class WebhookTest extends TestCase
     {
         $this->sendWebhook('{not json')->assertStatus(422);
         $this->sendWebhook($this->event($this->session, 'demo.win', -5))->assertStatus(422);
-        $this->sendWebhook($this->event($this->session, 'demo.win', '100'))->assertStatus(422);
+        // A numeric string is not an integer amount.
+        $this->sendWebhook($this->event($this->session, 'demo.win', 100, ['amount' => '100']))->assertStatus(422);
         $this->sendWebhook(str_repeat('a', 70_000))->assertStatus(413)->assertJsonPath('error.code', 'PAYLOAD_TOO_LARGE');
 
         $this->assertSame(10_000, $this->wallet()->balance_minor);
