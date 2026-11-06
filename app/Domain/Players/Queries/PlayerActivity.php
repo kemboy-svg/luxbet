@@ -8,8 +8,8 @@ use App\Domain\GameProviders\Models\GameSession;
 use App\Models\User;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Date;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Read-only summaries of a player's demo play, for the dashboard and the
