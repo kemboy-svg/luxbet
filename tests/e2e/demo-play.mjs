@@ -126,12 +126,22 @@ await shot('play-history');
 // Mobile view of a slot cabinet.
 await page.setViewportSize({ width: 390, height: 844 });
 await page.goto(`${BASE}/games/candy-crown`);
-await Promise.all([
-    page.waitForURL(/\/play\//),
-    page.getByRole('button', { name: /Play demo/ }).click(),
-]);
-await page.getByRole('button', { name: 'SPIN', exact: true }).click();
-await page.waitForTimeout(800);
+try {
+    await Promise.all([
+        page.waitForURL(/\/play\//, { timeout: 15000 }),
+        page.getByRole('button', { name: /Play demo/ }).click(),
+    ]);
+    await page.getByRole('button', { name: 'SPIN', exact: true }).click();
+    await page.waitForTimeout(800);
+} catch (e) {
+    const text = (await page.locator('main, body').first().innerText()).replace(
+        /\s+/g,
+        ' ',
+    );
+    fail(
+        `mobile: could not start a session (${String(e).split('\n')[0]}). Page: ${text.slice(0, 600)}`,
+    );
+}
 await shot('candy-crown-mobile');
 
 await browser.close();
