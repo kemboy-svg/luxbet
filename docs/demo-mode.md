@@ -16,6 +16,23 @@ The initial release is a non-cash demo platform.
 - Categories without a tested provider integration (live casino, poker,
   crash) are shown as "coming soon", never as playable.
 
+## Demo wallet
+
+- Every player has one demo wallet in `XXX` (ISO 4217 "no currency"), funded
+  with 10,000 credits at registration.
+- Every balance change goes through `RecordDemoTransaction`: one database
+  transaction, wallet row locked `FOR UPDATE`, one append-only ledger row,
+  balances computed on the server.
+- Repeating a request with the same idempotency key changes nothing and
+  returns the original transaction; reusing a key for a different request is
+  refused.
+- Zero, negative or oversized amounts, overdrafts and inactive wallets are
+  refused with nothing changed.
+- Players can reset to the allowance once a day when below it.
+- Staff with `demo_wallet.adjust` can credit or debit with a reason; each
+  adjustment is audited and labelled "no cash value".
+- There is no withdrawal, transfer, purchase or conversion operation.
+
 ## For developers
 
 - Label every balance and transaction as demo.

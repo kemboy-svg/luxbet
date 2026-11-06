@@ -86,8 +86,60 @@ Check constraints:
 - `launch_control_version_positive`: `version >= 1`
 - `launch_control_real_money_locked`: `real_money_enabled = false`
 
+## `currencies`
+
+Display and demo configuration only; a listed currency does not mean
+payments or gambling in it are authorised.
+
+| Column | Type | Notes |
+| --- | --- | --- |
+| `code` | char(3) PK | ISO 4217 |
+| `name` | varchar | |
+| `minor_unit` | smallint | 0–4 |
+| `is_enabled` | boolean | |
+| `is_demo_unit` | boolean | True only for `XXX` |
+
+Seeded: `XXX` (Demo credits, minor unit 0), `MUR`, `USD`, `EUR`, `KES`. `XXX`
+is ISO 4217's "no currency" code; demo wallets use it so demo credits are
+abstract units, never amounts of real money.
+
+## `demo_wallets`
+
+| Column | Type | Notes |
+| --- | --- | --- |
+| `id` | uuid PK | |
+| `user_id` | uuid FK → `users.id` | |
+| `currency_code` | char(3) FK → `currencies.code` | `XXX` |
+| `balance_minor` | bigint | Demo credits; check `>= 0` |
+| `status` | varchar(16) | `active`, `locked`, `closed` |
+
+Unique `(user_id, currency_code)`.
+
+## `demo_wallet_transactions`
+
+Append-only demo-credit ledger (trigger rejects UPDATE and DELETE). Never a
+cash ledger (ADR-002).
+
+| Column | Type | Notes |
+| --- | --- | --- |
+| `id` | uuid PK | |
+| `wallet_id` | uuid FK → `demo_wallets.id` | Restrict on delete |
+| `reference` | varchar(32), unique | `DTX-…` |
+| `type` | varchar | `demo_credit`, `demo_bet`, `demo_win`, `demo_refund`, `demo_adjustment` |
+| `direction` | varchar | `credit` or `debit` |
+| `amount_minor` | bigint | Check `> 0` |
+| `balance_before_minor`, `balance_after_minor` | bigint | Check `>= 0` and consistent with direction |
+| `source` | varchar | `system`, `provider_sandbox`, `admin` |
+| `external_reference` | varchar, null | e.g. provider round ID |
+| `idempotency_key` | varchar(191), null, unique | |
+| `description` | varchar(255) | |
+| `created_by` | uuid, null | Staff or player who caused it; no FK |
+
+`demo_tx_direction_matches` enforces: credits add (`demo_credit`,
+`demo_win`, `demo_refund`, `demo_adjustment`), debits subtract (`demo_bet`,
+`demo_adjustment`), and `after = before ± amount`.
+
 ## Planned tables
 
-`currencies`, `demo_wallets`, `demo_wallet_transactions`, `game_providers`,
-`games`, `game_sessions`, `provider_webhook_events`,
+`game_providers`, `games`, `game_sessions`, `provider_webhook_events`,
 `responsible_play_settings`. See `instructions.md` §5.1.

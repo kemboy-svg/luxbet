@@ -40,7 +40,7 @@ a response.
 | `Identity` | Roles, permissions, account status (Milestone 2) |
 | `Players` | Player profiles, registration, status changes (Milestone 2) |
 | `Audit` | Append-only audit log (Milestone 2) |
-| `DemoWallet` | Milestone 3 — demo-credit ledger, separate from any future cash ledger ([ADR-002](decisions/ADR-002-demo-wallet-separation.md)) |
+| `DemoWallet` | Demo-credit wallets and append-only ledger, separate from any future cash ledger ([ADR-002](decisions/ADR-002-demo-wallet-separation.md)) (Milestone 3) |
 | `Games`, `GameProviders` | Milestones 4–5 |
 | `ResponsiblePlay`, `Administration` | Milestones 3–6 |
 
@@ -50,6 +50,8 @@ a response.
 - `routes/admin.php`: staff area at `/admin` (auth, verified, `admin.access`,
   confirmed 2FA).
 - `routes/api.php`: JSON API mounted at `/api/v1` with the standard envelope
-  (see [api-contracts.md](api-contracts.md)).
+  (see [api-contracts.md](api-contracts.md)). Player endpoints use the
+  `api.session` middleware group: the web session cookie and CSRF, without
+  Inertia.
 - `real-money` middleware alias: guards anything that would touch real money.
   No such route exists in this release.
