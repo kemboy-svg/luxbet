@@ -4,8 +4,8 @@ namespace App\Domain\Games\Catalogue;
 
 use App\Domain\Games\Enums\GameCategory;
 use App\Domain\Games\Models\Game;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 
 /**

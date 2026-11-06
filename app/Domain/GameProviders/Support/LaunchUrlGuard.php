@@ -53,6 +53,6 @@ class LaunchUrlGuard
         /** @var list<string> $hosts */
         $hosts = config('luxbet.providers.launch_hosts', []);
 
-        return array_values(array_map('strtolower', $hosts));
+        return array_map('strtolower', $hosts);
     }
 }
