@@ -22,7 +22,8 @@ class ProfileController extends Controller
     public function edit(Request $request): Response
     {
         return Inertia::render('settings/Profile', [
-            'mustVerifyEmail' => $request->user() instanceof MustVerifyEmail,
+            'mustVerifyEmail' => $request->user() instanceof MustVerifyEmail
+                && config('luxbet.require_email_verification') === true,
             'status' => $request->session()->get('status'),
         ]);
     }

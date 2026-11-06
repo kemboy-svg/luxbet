@@ -3,6 +3,7 @@
 use App\Domain\DemoWallet\Exceptions\DemoWalletException;
 use App\Http\Middleware\AssignRequestId;
 use App\Http\Middleware\EnsureAccountIsActive;
+use App\Http\Middleware\EnsureEmailIsVerifiedWhenRequired;
 use App\Http\Middleware\EnsureRealMoneyEnabled;
 use App\Http\Middleware\EnsureStaffHasTwoFactor;
 use App\Http\Middleware\HandleAppearance;
@@ -64,6 +65,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'real-money' => EnsureRealMoneyEnabled::class,
             'staff.mfa' => EnsureStaffHasTwoFactor::class,
+            'verified' => EnsureEmailIsVerifiedWhenRequired::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

@@ -39,8 +39,13 @@ php artisan migrate
 composer run dev
 ```
 
-Open http://localhost:8000. Emails (verification, password reset) are caught by
-Mailpit at http://localhost:8025.
+Open http://localhost:8000.
+
+Email verification is **off** for now (`LUXBET_REQUIRE_EMAIL_VERIFICATION=false`):
+players can use the site straight after registering and no verification
+email is sent. Other emails (password reset) go to `storage/logs/laravel.log`
+with `MAIL_MAILER=log`, or to Mailpit at http://localhost:8025 with
+`MAIL_MAILER=smtp` and `docker compose up -d mailpit`.
 
 ### Staff accounts
 

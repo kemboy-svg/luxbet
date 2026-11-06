@@ -87,6 +87,18 @@ class User extends Authenticatable implements MustVerifyEmail, PasskeyUser
         return $this->hasMany(DemoWallet::class);
     }
 
+    /**
+     * Only send the verification email when verification is required
+     * (luxbet.require_email_verification). Otherwise registration needs no
+     * working mailer.
+     */
+    public function sendEmailVerificationNotification(): void
+    {
+        if (config('luxbet.require_email_verification')) {
+            parent::sendEmailVerificationNotification();
+        }
+    }
+
     public function isActive(): bool
     {
         return $this->status->canSignIn();

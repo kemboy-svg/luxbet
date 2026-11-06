@@ -34,6 +34,9 @@
         <env name="QUEUE_CONNECTION" value="sync"/>
         <env name="SESSION_DRIVER" value="array"/>
         <env name="LUXBET_ENVIRONMENT_MODE" value="demo"/>
+        <!-- The suite runs with verification on so those flows stay tested;
+             EmailVerificationOptionalTest covers the switched-off mode. -->
+        <env name="LUXBET_REQUIRE_EMAIL_VERIFICATION" value="true"/>
         <env name="PULSE_ENABLED" value="false"/>
         <env name="TELESCOPE_ENABLED" value="false"/>
         <env name="NIGHTWATCH_ENABLED" value="false"/>
