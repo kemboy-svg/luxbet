@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { Link, usePage } from '@inertiajs/vue3';
 import {
+    Gamepad2,
     LayoutGrid,
     LockKeyhole,
+    Server,
     ShieldCheck,
     Users,
     Wallet,
@@ -30,6 +32,11 @@ const mainNavItems: NavItem[] = [
         icon: LayoutGrid,
     },
     {
+        title: 'Games',
+        href: '/games',
+        icon: Gamepad2,
+    },
+    {
         title: 'Demo wallet',
         href: '/demo-wallet',
         icon: Wallet,
@@ -53,6 +60,18 @@ const adminNavItems = computed<NavItem[]>(() => {
 
     if (permissions.includes('players.view')) {
         items.push({ title: 'Players', href: '/admin/players', icon: Users });
+    }
+
+    if (permissions.includes('games.view')) {
+        items.push({ title: 'Games', href: '/admin/games', icon: Gamepad2 });
+    }
+
+    if (permissions.includes('providers.view')) {
+        items.push({
+            title: 'Providers',
+            href: '/admin/providers',
+            icon: Server,
+        });
     }
 
     if (permissions.includes('launch_gate.view')) {

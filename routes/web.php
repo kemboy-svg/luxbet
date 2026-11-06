@@ -1,9 +1,16 @@
 <?php
 
+use App\Http\Controllers\Games\GameController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Player\DemoWalletController;
 use Illuminate\Support\Facades\Route;
 
-Route::inertia('/', 'Welcome')->name('home');
+Route::get('/', HomeController::class)->name('home');
+
+Route::get('games', [GameController::class, 'index'])->name('games.index');
+Route::get('games/{slug}', [GameController::class, 'show'])
+    ->where('slug', '[a-z0-9]+(?:-[a-z0-9]+)*')
+    ->name('games.show');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::inertia('dashboard', 'Dashboard')->name('dashboard');
