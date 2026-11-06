@@ -37,6 +37,20 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Email verification
+    |--------------------------------------------------------------------------
+    |
+    | When false (the current default), players can use the site straight
+    | after registering and no verification email is sent. The verification
+    | pages stay in place; set LUXBET_REQUIRE_EMAIL_VERIFICATION=true to turn
+    | the requirement back on (a working mailer is then needed).
+    |
+    */
+
+    'require_email_verification' => (bool) env('LUXBET_REQUIRE_EMAIL_VERIFICATION', false),
+
+    /*
+    |--------------------------------------------------------------------------
     | Demo wallet
     |--------------------------------------------------------------------------
     |
