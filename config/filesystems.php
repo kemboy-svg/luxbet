@@ -33,7 +33,9 @@ return [
         'local' => [
             'driver' => 'local',
             'root' => storage_path('app/private'),
-            'serve' => true,
+            // Off: LuxBet does not serve private files over HTTP, and serving
+            // registers GET/PUT storage/{path} routes (signed URLs) we don't need.
+            'serve' => false,
             'throw' => false,
             'report' => false,
         ],
