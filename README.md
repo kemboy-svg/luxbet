@@ -1,27 +1,74 @@
-# Laravel + Vue Starter Kit
+# LuxBet Casino
 
-## Introduction
+A secure, modular casino platform built with Laravel 13, Vue 3, Inertia and
+PostgreSQL.
 
-Our Vue starter kit provides a robust, modern starting point for building Laravel applications with a Vue frontend using [Inertia](https://inertiajs.com).
+> **Demo only.** Real-money gambling, deposits, withdrawals, wagering and
+> cash-equivalent rewards are disabled and enforced server-side. Demo credits
+> are fictional and have no monetary value. See
+> [docs/regulatory-launch-gate.md](docs/regulatory-launch-gate.md).
 
-Inertia allows you to build modern, single-page Vue applications using classic server-side routing and controllers. This lets you enjoy the frontend power of Vue combined with the incredible backend productivity of Laravel and lightning-fast Vite compilation.
+The full specification lives in [instructions.md](instructions.md).
 
-This Vue starter kit utilizes Vue 3 and the Composition API, TypeScript, Tailwind, and the [shadcn-vue](https://www.shadcn-vue.com) component library.
+## Requirements
 
-## Official Documentation
+- PHP 8.3+ with `pdo_pgsql`, `redis`, `intl`, `mbstring`, `zip`
+- Composer 2
+- Node.js 22 and npm
+- PostgreSQL 16 and Redis 7 (or Docker, which provides both)
 
-Documentation for all Laravel starter kits can be found on the [Laravel website](https://laravel.com/docs/starter-kits).
+## Local setup
 
-## Contributing
+```bash
+git clone https://github.com/kemboy-svg/luxbet.git
+cd luxbet
 
-Thank you for considering contributing to our starter kit! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+# 1. Start PostgreSQL, Redis and Mailpit (or use your own local services)
+docker compose up -d pgsql redis mailpit
 
-All contributions to the Starter Kits from now on should be made through [Maestro](https://github.com/laravel/maestro).
+# 2. Install dependencies
+composer install
+npm install
 
-## Code of Conduct
+# 3. Configure the environment
+cp .env.example .env
+php artisan key:generate
+php artisan migrate
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+# 4. Run the app (Laravel server, queue, logs and Vite together)
+composer run dev
+```
 
-## License
+Open http://localhost:8000. Emails (verification, password reset) are caught by
+Mailpit at http://localhost:8025.
 
-The Laravel + Vue starter kit is open-sourced software licensed under the MIT license.
+The Docker stack also includes `app` (PHP-FPM) and `nginx` services if you
+prefer to run everything in containers: `docker compose up -d`, then
+http://localhost:8080.
+
+## Checks
+
+```bash
+composer test          # Pint (style), Larastan (static analysis), PHPUnit
+npm run check          # lint and formatting
+npm run types:check    # vue-tsc
+php artisan luxbet:launch-gate   # read-only real-money gate status
+```
+
+Tests run against a PostgreSQL database named `luxbet_testing` (created
+automatically by the Docker stack). See [docs/testing.md](docs/testing.md).
+
+## Documentation
+
+| Document | Topic |
+| --- | --- |
+| [docs/architecture.md](docs/architecture.md) | Modular monolith, modules, request flow |
+| [docs/regulatory-launch-gate.md](docs/regulatory-launch-gate.md) | How real money stays disabled |
+| [docs/demo-mode.md](docs/demo-mode.md) | What demo mode means for users and code |
+| [docs/api-contracts.md](docs/api-contracts.md) | `/api/v1` envelopes and endpoints |
+| [docs/database-schema.md](docs/database-schema.md) | Tables and constraints |
+| [docs/provider-integration.md](docs/provider-integration.md) | Game-provider adapters |
+| [docs/security.md](docs/security.md) | Security controls |
+| [docs/testing.md](docs/testing.md) | Running and writing tests |
+| [docs/deployment.md](docs/deployment.md) | Environments and deployment |
+| [docs/decisions/](docs/decisions/) | Architecture decision records |
