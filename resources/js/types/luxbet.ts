@@ -5,6 +5,8 @@ export type EnvironmentMode = 'demo' | 'staging' | 'production';
  * the server is the enforcement layer for the real-money launch gate.
  */
 export type LuxBetSharedProps = {
+    /** Session reminder interval in minutes; null when switched off. */
+    reminderMinutes: number | null;
     environmentMode: EnvironmentMode;
     realMoneyEnabled: boolean;
     demoNotice: {

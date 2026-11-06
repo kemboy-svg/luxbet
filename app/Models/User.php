@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Domain\DemoWallet\Models\DemoWallet;
+use App\Domain\Games\Models\Game;
 use App\Domain\Identity\Authorization\Role;
 use App\Domain\Identity\Enums\UserStatus;
 use App\Domain\Players\Models\PlayerProfile;
@@ -13,6 +14,7 @@ use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -97,6 +99,14 @@ class User extends Authenticatable implements MustVerifyEmail, PasskeyUser
         if (config('luxbet.require_email_verification')) {
             parent::sendEmailVerificationNotification();
         }
+    }
+
+    /**
+     * @return BelongsToMany<Game, $this>
+     */
+    public function favouriteGames(): BelongsToMany
+    {
+        return $this->belongsToMany(Game::class, 'favourite_games')->withPivot('created_at');
     }
 
     public function isActive(): bool

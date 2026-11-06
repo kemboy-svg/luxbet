@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Domain\Compliance\LaunchGate\LaunchGate;
+use App\Domain\ResponsiblePlay\Models\ResponsiblePlaySetting;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
@@ -51,7 +52,12 @@ class HandleInertiaRequests extends Middleware
             'luxbet' => function (): array {
                 $gate = app(LaunchGate::class)->status();
 
+                $user = request()->user();
+
                 return [
+                    'reminderMinutes' => $user instanceof User
+                        ? ResponsiblePlaySetting::forUser($user)->demo_session_reminder_minutes
+                        : null,
                     'environmentMode' => $gate->environmentMode->value,
                     'realMoneyEnabled' => $gate->realMoneyEnabled,
                     'demoNotice' => [

@@ -3,6 +3,7 @@
 use App\Http\Controllers\Games\GameController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Player\DemoWalletController;
+use App\Http\Controllers\Player\FavouriteController;
 use App\Http\Controllers\Player\PlayController;
 use Illuminate\Support\Facades\Route;
 
@@ -20,6 +21,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('demo-wallet/reset', [DemoWalletController::class, 'reset'])
         ->middleware('throttle:10,1')
         ->name('demo-wallet.reset');
+
+    Route::post('games/{slug}/favourite', [FavouriteController::class, 'store'])
+        ->where('slug', '[a-z0-9]+(?:-[a-z0-9]+)*')
+        ->middleware('throttle:60,1')
+        ->name('games.favourite.store');
+    Route::delete('games/{slug}/favourite', [FavouriteController::class, 'destroy'])
+        ->where('slug', '[a-z0-9]+(?:-[a-z0-9]+)*')
+        ->middleware('throttle:60,1')
+        ->name('games.favourite.destroy');
 
     Route::post('games/{slug}/play', [PlayController::class, 'start'])
         ->where('slug', '[a-z0-9]+(?:-[a-z0-9]+)*')

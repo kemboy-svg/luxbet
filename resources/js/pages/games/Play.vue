@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { Head, Link, router } from '@inertiajs/vue3';
-import { Minus, Plus, X } from '@lucide/vue';
+import { Head, Link, router, usePage } from '@inertiajs/vue3';
+import { Minus, Plus, Timer, X } from '@lucide/vue';
 import { computed, onBeforeUnmount, ref } from 'vue';
 import HeroScene from '@/components/luxbet/HeroScene.vue';
 import LuxBetLogo from '@/components/luxbet/LuxBetLogo.vue';
@@ -87,6 +87,23 @@ const resultText = computed(() => {
     return 'No win this time';
 });
 
+// Responsible-play reminder: shown every N minutes the player has this
+// screen open, per their setting (Settings → Responsible play).
+const reminderEvery = usePage().props.luxbet.reminderMinutes;
+const startedAt = Date.now();
+const reminderDue = ref<number | null>(null);
+let lastReminderAt = startedAt;
+
+function checkReminder(): void {
+    if (!reminderEvery) {
+        return;
+    }
+    if (Date.now() - lastReminderAt >= reminderEvery * 60000) {
+        lastReminderAt = Date.now();
+        reminderDue.value = Math.round((Date.now() - startedAt) / 60000);
+    }
+}
+
 const minutesLeft = ref(0);
 function updateMinutes(): void {
     minutesLeft.value = Math.max(
@@ -100,7 +117,10 @@ function updateMinutes(): void {
     }
 }
 updateMinutes();
-const timer = window.setInterval(updateMinutes, 15000);
+const timer = window.setInterval(() => {
+    updateMinutes();
+    checkReminder();
+}, 15000);
 onBeforeUnmount(() => window.clearInterval(timer));
 
 function xsrfToken(): string {
@@ -289,6 +309,40 @@ function endSession(): void {
             >
                 {{ resultText }}
             </p>
+            <div
+                v-if="reminderDue !== null"
+                role="alertdialog"
+                aria-labelledby="reminder-title"
+                class="flex max-w-md flex-col items-center gap-3 rounded-2xl border border-demo-band bg-plum-950/90 p-5 text-center"
+            >
+                <Timer
+                    class="size-7 text-demo-band-foreground"
+                    aria-hidden="true"
+                />
+                <p id="reminder-title" class="font-bold">
+                    You've been playing for {{ reminderDue }} minutes.
+                </p>
+                <p class="text-sm text-plum-200">
+                    A good moment for a break? Your demo credits will be here
+                    when you get back.
+                </p>
+                <div class="flex gap-2">
+                    <button
+                        type="button"
+                        class="rounded-lg bg-plum-600 px-4 py-2 text-sm font-semibold"
+                        @click="reminderDue = null"
+                    >
+                        Keep playing
+                    </button>
+                    <button
+                        type="button"
+                        class="rounded-lg bg-linear-to-b from-gold-200 via-gold-500 to-gold-600 px-4 py-2 text-sm font-bold text-gold-900"
+                        @click="endSession"
+                    >
+                        Take a break
+                    </button>
+                </div>
+            </div>
             <p
                 v-if="error"
                 class="rounded-lg bg-plum-950/80 px-4 py-2 text-center text-sm text-[#F4A79D]"

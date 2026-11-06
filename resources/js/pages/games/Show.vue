@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
-import { ArrowLeft, Clock3, Play } from '@lucide/vue';
+import { Head, Link, router, useForm, usePage } from '@inertiajs/vue3';
+import { ArrowLeft, Clock3, Heart, Play } from '@lucide/vue';
 import { computed } from 'vue';
 import GameTile from '@/components/luxbet/GameTile.vue';
 import PublicShell from '@/components/luxbet/PublicShell.vue';
@@ -10,12 +10,24 @@ import type { CatalogueGame } from '@/types/luxbet';
 const props = defineProps<{
     game: CatalogueGame;
     related: CatalogueGame[];
+    isFavourite: boolean;
 }>();
 
 const page = usePage();
 const signedIn = computed(() => Boolean(page.props.auth.user));
 
 const playForm = useForm({});
+
+function toggleFavourite(): void {
+    const url = `/games/${props.game.slug}/favourite`;
+    const options = { preserveScroll: true, preserveState: true } as const;
+
+    if (props.isFavourite) {
+        router.delete(url, options);
+    } else {
+        router.post(url, {}, options);
+    }
+}
 
 function play(): void {
     playForm.post(`/games/${props.game.slug}/play`, { preserveScroll: true });
@@ -57,9 +69,33 @@ const providerLabel = computed(() =>
                         >
                     </div>
 
-                    <h1 class="text-4xl font-extrabold md:text-5xl">
-                        {{ game.name }}
-                    </h1>
+                    <div class="flex items-start justify-between gap-4">
+                        <h1 class="text-4xl font-extrabold md:text-5xl">
+                            {{ game.name }}
+                        </h1>
+                        <button
+                            v-if="signedIn"
+                            type="button"
+                            :aria-pressed="isFavourite"
+                            :aria-label="
+                                isFavourite
+                                    ? 'Remove from favourites'
+                                    : 'Add to favourites'
+                            "
+                            class="flex size-12 shrink-0 items-center justify-center rounded-full border border-plum-400 transition-colors hover:border-gold-500"
+                            @click="toggleFavourite"
+                        >
+                            <Heart
+                                class="size-6"
+                                :class="
+                                    isFavourite
+                                        ? 'fill-[#E3223F] text-[#E3223F]'
+                                        : 'text-plum-200'
+                                "
+                                aria-hidden="true"
+                            />
+                        </button>
+                    </div>
                     <p v-if="game.description" class="text-lg text-plum-200">
                         {{ game.description }}
                     </p>
