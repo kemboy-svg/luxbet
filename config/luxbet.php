@@ -1,5 +1,7 @@
 <?php
 
+use App\Domain\GameProviders\Adapters\LocalSimulatorAdapter;
+
 return [
 
     /*
@@ -67,6 +69,46 @@ return [
         // Upper bound for a single ledger entry, as a guard against bad input.
         'max_transaction' => 1_000_000,
         'max_admin_adjustment' => 100_000,
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Game providers
+    |--------------------------------------------------------------------------
+    |
+    | One adapter class per provider slug. Only the local simulator exists
+    | until a real provider's official sandbox documentation is supplied.
+    | Launch URLs must be HTTPS (or this app's own URL) on an allowlisted
+    | host; anything else is refused.
+    |
+    */
+
+    'providers' => [
+        'adapters' => [
+            'local-simulator' => LocalSimulatorAdapter::class,
+        ],
+
+        'session_minutes' => 30,
+
+        // Extra hosts allowed for provider launch URLs (comma-separated).
+        // This app's own host is always allowed, for the simulator.
+        'launch_hosts' => array_values(array_filter(array_map('trim', explode(',', (string) env('LUXBET_PROVIDER_LAUNCH_HOSTS', ''))))),
+
+        'webhook' => [
+            'max_body_bytes' => 65_536,
+            'replay_window_seconds' => 300,
+        ],
+
+        'http' => [
+            'timeout_seconds' => 5,
+            'connect_timeout_seconds' => 3,
+        ],
+
+        'simulator' => [
+            // Set to false to simulate provider downtime.
+            'available' => (bool) env('LUXBET_SIMULATOR_AVAILABLE', true),
+            'stakes' => [10, 50, 100, 250, 500],
+        ],
     ],
 
     /*
