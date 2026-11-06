@@ -1,6 +1,12 @@
 <script setup lang="ts">
 import { Link, usePage } from '@inertiajs/vue3';
-import { LayoutGrid, LockKeyhole, ShieldCheck, Users } from '@lucide/vue';
+import {
+    LayoutGrid,
+    LockKeyhole,
+    ShieldCheck,
+    Users,
+    Wallet,
+} from '@lucide/vue';
 import { computed } from 'vue';
 import AppLogo from '@/components/AppLogo.vue';
 import NavMain from '@/components/NavMain.vue';
@@ -22,6 +28,11 @@ const mainNavItems: NavItem[] = [
         title: 'Dashboard',
         href: dashboard(),
         icon: LayoutGrid,
+    },
+    {
+        title: 'Demo wallet',
+        href: '/demo-wallet',
+        icon: Wallet,
     },
 ];
 

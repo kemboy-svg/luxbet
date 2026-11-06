@@ -124,7 +124,7 @@ class LaunchGateTest extends TestCase
     /** §11.6 (3), (6) — no deposit, withdrawal or cash-out endpoints exist */
     public function test_no_deposit_withdrawal_or_cash_out_endpoints_exist(): void
     {
-        foreach (['deposit', 'deposits', 'withdraw', 'withdrawals', 'cashout', 'cash-out', 'payments'] as $path) {
+        foreach (['deposit', 'deposits', 'withdraw', 'withdrawals', 'cashout', 'cash-out', 'payments', 'demo-wallets/transfer'] as $path) {
             $this->postJson("/api/v1/{$path}")
                 ->assertNotFound()
                 ->assertJsonPath('error.code', 'NOT_FOUND');
@@ -132,7 +132,7 @@ class LaunchGateTest extends TestCase
 
         $offending = collect(Route::getRoutes()->getRoutes())
             ->map(fn (RoutingRoute $route): string => $route->uri())
-            ->filter(fn (string $uri): bool => preg_match('/deposit|withdraw|cash-?out|payout/i', $uri) === 1)
+            ->filter(fn (string $uri): bool => preg_match('/deposit|withdraw|cash-?out|payout|transfer|convert|redeem|purchase/i', $uri) === 1)
             ->values()
             ->all();
 
