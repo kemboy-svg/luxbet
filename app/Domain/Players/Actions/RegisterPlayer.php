@@ -3,18 +3,23 @@
 namespace App\Domain\Players\Actions;
 
 use App\Domain\Audit\AuditLogger;
+use App\Domain\DemoWallet\Actions\EnsureDemoWallet;
 use App\Domain\Identity\Authorization\Role;
 use App\Domain\Players\Models\PlayerProfile;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 
 /**
- * Creates a demo player account: user, profile and player role together.
+ * Creates a demo player account: user, profile, player role and demo
+ * wallet (with its starting allowance) together.
  * Input must already be validated.
  */
 class RegisterPlayer
 {
-    public function __construct(private readonly AuditLogger $audit) {}
+    public function __construct(
+        private readonly AuditLogger $audit,
+        private readonly EnsureDemoWallet $ensureDemoWallet,
+    ) {}
 
     public function __invoke(string $name, string $email, string $password, string $username): User
     {
@@ -34,6 +39,8 @@ class RegisterPlayer
             $user->playerProfile()->save($profile);
 
             $user->assignRole(Role::Player->value);
+
+            ($this->ensureDemoWallet)($user);
 
             $this->audit->record('player.registered', subject: $user, actor: $user, metadata: [
                 'terms_version' => config('luxbet.terms_version'),

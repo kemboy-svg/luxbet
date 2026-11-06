@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Domain\DemoWallet\Actions\EnsureDemoWallet;
 use App\Domain\Identity\Authorization\Role;
 use App\Domain\Identity\Enums\UserStatus;
 use App\Domain\Players\Models\PlayerProfile;
@@ -63,13 +64,15 @@ class UserFactory extends Factory
     }
 
     /**
-     * A registered player with a profile and the player role.
+     * A registered player with a profile, the player role and a demo wallet
+     * holding the starting allowance.
      */
     public function player(): static
     {
         return $this->afterCreating(function (User $user): void {
             $user->assignRole(Role::Player->value);
             PlayerProfile::factory()->for($user)->create();
+            app(EnsureDemoWallet::class)($user);
         });
     }
 
