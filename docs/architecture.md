@@ -37,14 +37,18 @@ a response.
 | Module | Status |
 | --- | --- |
 | `Compliance` | Launch gate, launch-control record (Milestone 1) |
-| `Identity`, `Players` | Milestone 2 |
+| `Identity` | Roles, permissions, account status (Milestone 2) |
+| `Players` | Player profiles, registration, status changes (Milestone 2) |
+| `Audit` | Append-only audit log (Milestone 2) |
 | `DemoWallet` | Milestone 3 — demo-credit ledger, separate from any future cash ledger ([ADR-002](decisions/ADR-002-demo-wallet-separation.md)) |
 | `Games`, `GameProviders` | Milestones 4–5 |
-| `ResponsiblePlay`, `Administration`, `Audit` | Milestones 2–6 |
+| `ResponsiblePlay`, `Administration` | Milestones 3–6 |
 
 ## Routing
 
 - `routes/web.php`, `routes/settings.php`: Inertia pages.
+- `routes/admin.php`: staff area at `/admin` (auth, verified, `admin.access`,
+  confirmed 2FA).
 - `routes/api.php`: JSON API mounted at `/api/v1` with the standard envelope
   (see [api-contracts.md](api-contracts.md)).
 - `real-money` middleware alias: guards anything that would touch real money.

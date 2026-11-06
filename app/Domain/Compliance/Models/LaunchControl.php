@@ -20,7 +20,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property array<int, string>|null $approved_jurisdictions
  * @property string|null $approval_reference
  * @property string|null $approval_document_path
- * @property int|null $approved_by
+ * @property string|null $approved_by
  * @property CarbonImmutable|null $approved_at
  * @property CarbonImmutable|null $review_due_at
  * @property string|null $change_reason

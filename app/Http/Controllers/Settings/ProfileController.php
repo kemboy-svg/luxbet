@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Settings;
 
+use App\Domain\Identity\Enums\UserStatus;
+use App\Domain\Players\Actions\ChangeAccountStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Settings\ProfileDeleteRequest;
 use App\Http\Requests\Settings\ProfileUpdateRequest;
@@ -46,13 +48,16 @@ class ProfileController extends Controller
     /**
      * Delete the user's profile.
      */
-    public function destroy(ProfileDeleteRequest $request): RedirectResponse
+    public function destroy(ProfileDeleteRequest $request, ChangeAccountStatus $changeStatus): RedirectResponse
     {
         $user = $request->user();
 
-        Auth::logout();
+        // Accounts are closed rather than hard-deleted so the audit trail
+        // stays intact. Data retention and erasure follow the privacy
+        // procedures in docs/security.md.
+        $changeStatus($user, UserStatus::Closed, 'Closed by the account holder.', actor: $user);
 
-        $user->delete();
+        Auth::logout();
 
         $request->session()->invalidate();
         $request->session()->regenerateToken();

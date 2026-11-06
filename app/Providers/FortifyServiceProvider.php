@@ -4,12 +4,16 @@ namespace App\Providers;
 
 use App\Actions\Fortify\CreateNewUser;
 use App\Actions\Fortify\ResetUserPassword;
+use App\Http\Middleware\EnsureAccountIsActive;
+use App\Models\User;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Password;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Laravel\Fortify\Features;
 use Laravel\Fortify\Fortify;
@@ -41,6 +45,31 @@ class FortifyServiceProvider extends ServiceProvider
     {
         Fortify::resetUserPasswordsUsing(ResetUserPassword::class);
         Fortify::createUsersUsing(CreateNewUser::class);
+
+        // Suspended, closed and pending accounts cannot sign in. The status
+        // is only revealed after the correct password has been given.
+        Fortify::authenticateUsing(function (Request $request): ?User {
+            $email = $request->input(Fortify::username());
+            $password = $request->input('password');
+
+            if (! is_string($email) || ! is_string($password)) {
+                return null;
+            }
+
+            $user = User::query()->where('email', Str::lower($email))->first();
+
+            if ($user === null || ! Hash::check($password, $user->password)) {
+                return null;
+            }
+
+            if (! $user->isActive()) {
+                throw ValidationException::withMessages([
+                    Fortify::username() => EnsureAccountIsActive::MESSAGE,
+                ]);
+            }
+
+            return $user;
+        });
     }
 
     /**

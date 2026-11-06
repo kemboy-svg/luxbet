@@ -25,22 +25,23 @@ const passwordInput = useTemplateRef('passwordInput');
     <div class="space-y-6">
         <Heading
             variant="small"
-            title="Delete account"
-            description="Delete your account and all of its resources"
+            title="Close account"
+            description="Close your demo account and sign out"
         />
         <div
-            class="space-y-4 rounded-lg border border-red-100 bg-red-50 p-4 dark:border-red-200/10 dark:bg-red-700/10"
+            class="space-y-4 rounded-lg border border-destructive/40 bg-destructive/10 p-4"
         >
-            <div class="relative space-y-0.5 text-red-600 dark:text-red-100">
+            <div class="relative space-y-0.5 text-red-200">
                 <p class="font-medium">Warning</p>
                 <p class="text-sm">
-                    Please proceed with caution, this cannot be undone.
+                    You won't be able to sign in again. Contact support if you
+                    change your mind.
                 </p>
             </div>
             <Dialog>
                 <DialogTrigger as-child>
                     <Button variant="destructive" data-test="delete-user-button"
-                        >Delete account</Button
+                        >Close account</Button
                     >
                 </DialogTrigger>
                 <DialogContent>
@@ -56,15 +57,13 @@ const passwordInput = useTemplateRef('passwordInput');
                     >
                         <DialogHeader class="space-y-3">
                             <DialogTitle
-                                >Are you sure you want to delete your
+                                >Are you sure you want to close your
                                 account?</DialogTitle
                             >
                             <DialogDescription>
-                                Once your account is deleted, all of its
-                                resources and data will also be permanently
-                                deleted. Please enter your password to confirm
-                                you would like to permanently delete your
-                                account.
+                                Your account will be closed and you will be
+                                signed out. Demo credits have no value and are
+                                not refundable. Enter your password to confirm.
                             </DialogDescription>
                         </DialogHeader>
 
@@ -102,7 +101,7 @@ const passwordInput = useTemplateRef('passwordInput');
                                 :disabled="processing"
                                 data-test="confirm-delete-user-button"
                             >
-                                Delete account
+                                Close account
                             </Button>
                         </DialogFooter>
                     </Form>

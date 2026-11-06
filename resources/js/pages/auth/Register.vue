@@ -16,8 +16,8 @@ defineProps<{
 
 defineOptions({
     layout: {
-        title: 'Create an account',
-        description: 'Enter your details below to create your account',
+        title: 'Create a demo account',
+        description: 'You get free demo credits. They have no cash value.',
     },
 });
 </script>
@@ -48,12 +48,31 @@ defineOptions({
             </div>
 
             <div class="grid gap-2">
+                <Label for="username">Username</Label>
+                <Input
+                    id="username"
+                    type="text"
+                    required
+                    :tabindex="2"
+                    autocomplete="username"
+                    name="username"
+                    placeholder="e.g. amara_k"
+                    aria-describedby="username-hint"
+                />
+                <p id="username-hint" class="text-xs text-muted-foreground">
+                    3–20 letters, numbers or underscores. Shown to other
+                    players.
+                </p>
+                <InputError :message="errors.username" />
+            </div>
+
+            <div class="grid gap-2">
                 <Label for="email">Email address</Label>
                 <Input
                     id="email"
                     type="email"
                     required
-                    :tabindex="2"
+                    :tabindex="3"
                     autocomplete="email"
                     name="email"
                     placeholder="email@example.com"
@@ -66,7 +85,7 @@ defineOptions({
                 <PasswordInput
                     id="password"
                     required
-                    :tabindex="3"
+                    :tabindex="4"
                     autocomplete="new-password"
                     name="password"
                     placeholder="Password"
@@ -80,7 +99,7 @@ defineOptions({
                 <PasswordInput
                     id="password_confirmation"
                     required
-                    :tabindex="4"
+                    :tabindex="5"
                     autocomplete="new-password"
                     name="password_confirmation"
                     placeholder="Confirm password"
@@ -89,16 +108,53 @@ defineOptions({
                 <InputError :message="errors.password_confirmation" />
             </div>
 
+            <div class="grid gap-3">
+                <div class="flex items-start gap-3">
+                    <input
+                        id="age_confirmed"
+                        type="checkbox"
+                        name="age_confirmed"
+                        required
+                        :tabindex="6"
+                        class="mt-0.5 size-5 shrink-0 accent-primary"
+                    />
+                    <Label for="age_confirmed" class="font-normal"
+                        >I'm 18 or older</Label
+                    >
+                </div>
+                <InputError :message="errors.age_confirmed" />
+
+                <div class="flex items-start gap-3">
+                    <input
+                        id="terms_accepted"
+                        type="checkbox"
+                        name="terms_accepted"
+                        required
+                        :tabindex="7"
+                        class="mt-0.5 size-5 shrink-0 accent-primary"
+                    />
+                    <Label for="terms_accepted" class="leading-snug font-normal"
+                        >I agree to the Terms of demo use and have read the
+                        Privacy notice</Label
+                    >
+                </div>
+                <InputError :message="errors.terms_accepted" />
+            </div>
+
             <Button
                 type="submit"
                 class="mt-2 w-full"
-                tabindex="5"
+                tabindex="8"
                 :disabled="processing"
                 data-test="register-user-button"
             >
                 <Spinner v-if="processing" />
-                Create account
+                Create demo account
             </Button>
+
+            <p class="text-center text-xs text-muted-foreground">
+                No card details, ID documents or payments — ever.
+            </p>
         </div>
 
         <div class="text-center text-sm text-muted-foreground">
@@ -106,7 +162,7 @@ defineOptions({
             <TextLink
                 :href="login()"
                 class="underline underline-offset-4"
-                :tabindex="6"
+                :tabindex="9"
                 >Log in</TextLink
             >
         </div>

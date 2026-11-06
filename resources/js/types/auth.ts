@@ -1,9 +1,10 @@
 export type User = {
-    id: number;
+    id: string;
     name: string;
     email: string;
     avatar?: string;
     email_verified_at: string | null;
+    status: 'active' | 'suspended' | 'closed' | 'pending';
     two_factor_enabled?: boolean;
     created_at: string;
     updated_at: string;
@@ -12,6 +13,8 @@ export type User = {
 
 export type Auth = {
     user: User;
+    /** The signed-in user's own permissions. For navigation only. */
+    permissions: string[];
 };
 
 export type Passkey = {
