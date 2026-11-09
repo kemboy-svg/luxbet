@@ -17,6 +17,9 @@ jobs:
       pgsql:
         image: postgres:16.6-alpine
         env:
+          # A non-UTC server time zone, like many local installs (regression guard).
+          TZ: Indian/Mauritius
+          PGTZ: Indian/Mauritius
           POSTGRES_DB: luxbet_testing
           POSTGRES_USER: luxbet
           POSTGRES_PASSWORD: luxbet_local_only

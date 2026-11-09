@@ -97,6 +97,12 @@ return [
             'prefix_indexes' => true,
             'search_path' => 'public',
             'sslmode' => env('DB_SSLMODE', 'prefer'),
+            // Laravel writes timestamps without an offset, so the database
+            // session must use the app's time zone (UTC). Otherwise a
+            // PostgreSQL server set to local time (e.g. Indian/Mauritius)
+            // shifts every timestamptz value, and new game sessions look
+            // hours past their expiry.
+            'timezone' => 'UTC',
         ],
 
         'sqlsrv' => [
