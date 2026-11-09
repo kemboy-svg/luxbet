@@ -2,6 +2,7 @@
 
 namespace App\Domain\Games\Catalogue;
 
+use App\Domain\GameProviders\Simulator\SimulatorRoundEngine;
 use App\Domain\Games\Enums\GameCategory;
 use App\Domain\Games\Models\Game;
 use Illuminate\Database\Eloquent\Builder;
@@ -122,6 +123,29 @@ class GameCatalogue
                 'name' => $game->provider->name,
                 'is_simulator' => $game->provider->is_simulator,
             ],
+            'simulation' => $game->provider->is_simulator ? $this->simulation($game) : null,
+        ];
+    }
+
+    /**
+     * Design figures of a local-simulator game, shown on the game page so
+     * players know what to expect. Not certified; demo credits only.
+     *
+     * @return array{rtp: float, volatility: string|null}|null
+     */
+    private function simulation(Game $game): ?array
+    {
+        $rtp = SimulatorRoundEngine::designRtp($game->category, $game->provider_game_code);
+
+        if ($rtp === null) {
+            return null;
+        }
+
+        return [
+            'rtp' => $rtp,
+            'volatility' => $game->category === GameCategory::Slots
+                ? SimulatorRoundEngine::profileFor($game->provider_game_code)
+                : null,
         ];
     }
 

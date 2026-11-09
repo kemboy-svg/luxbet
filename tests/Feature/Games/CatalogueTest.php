@@ -89,7 +89,17 @@ class CatalogueTest extends TestCase
                 ->where('game.playable', true)
                 ->where('game.demo_only', true)
                 ->where('game.provider.is_simulator', true)
+                ->where('game.simulation.volatility', 'low')
+                ->where('game.simulation.rtp', 95.6)
                 ->has('related'));
+
+        // Each slot title plays with its own profile.
+        $this->get(route('games.show', 'copper-comet'))
+            ->assertInertia(fn (Assert $page) => $page->where('game.simulation.volatility', 'high'));
+        $this->get(route('games.show', 'royal-21'))
+            ->assertInertia(fn (Assert $page) => $page
+                ->where('game.simulation.volatility', null)
+                ->where('game.simulation.rtp', 97.6));
     }
 
     public function test_disabled_games_are_hidden_everywhere(): void

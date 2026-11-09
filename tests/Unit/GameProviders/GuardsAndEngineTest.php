@@ -72,7 +72,7 @@ class GuardsAndEngineTest extends TestCase
         for ($i = 0; $i < 300; $i++) {
             $slots = $engine->play(GameCategory::Slots, 100);
             $this->assertGreaterThanOrEqual(0, $slots->payout);
-            $this->assertLessThanOrEqual(100 * 100, $slots->payout);
+            $this->assertLessThanOrEqual(100 * SimulatorRoundEngine::MAX_MULTIPLIER, $slots->payout);
             $this->assertCount(5, $slots->display['reels']);
 
             $table = $engine->play(GameCategory::Baccarat, 100);

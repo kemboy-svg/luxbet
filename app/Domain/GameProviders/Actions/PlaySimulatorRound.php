@@ -49,7 +49,7 @@ class PlaySimulatorRound
             throw new DemoSessionRefused('Choose one of the available stakes.');
         }
 
-        $outcome = $this->engine->play($session->game->category, $stake);
+        $outcome = $this->engine->play($session->game->category, $stake, $session->game->provider_game_code);
         $roundId = 'r_'.Str::lower(Str::random(16));
 
         $bet = $this->emit($session, DemoEventType::Bet, $roundId, $stake);
