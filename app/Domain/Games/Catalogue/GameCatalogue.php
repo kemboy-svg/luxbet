@@ -135,7 +135,7 @@ class GameCatalogue
      */
     private function simulation(Game $game): ?array
     {
-        $rtp = SimulatorRoundEngine::designRtp($game->category, $game->code);
+        $rtp = SimulatorRoundEngine::designRtp($game->category, $game->provider_game_code);
 
         if ($rtp === null) {
             return null;
@@ -144,7 +144,7 @@ class GameCatalogue
         return [
             'rtp' => $rtp,
             'volatility' => $game->category === GameCategory::Slots
-                ? SimulatorRoundEngine::profileFor($game->code)
+                ? SimulatorRoundEngine::profileFor($game->provider_game_code)
                 : null,
         ];
     }

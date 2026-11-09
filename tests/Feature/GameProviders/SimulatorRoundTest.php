@@ -32,6 +32,8 @@ class SimulatorRoundTest extends TestCase
             ->assertJsonPath('data.stake', 100)
             ->assertJsonPath('data.demo', true)
             ->assertJsonPath('data.display.kind', 'slots')
+            // candy-crown (the default launched game) uses the low-volatility profile.
+            ->assertJsonPath('data.display.profile', 'low')
             ->assertJsonCount(5, 'data.display.reels');
 
         $payout = (int) $response->json('data.payout');
