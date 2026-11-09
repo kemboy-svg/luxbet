@@ -67,3 +67,6 @@ controls). The development team must not do this on its own initiative.
 `tests/Unit/Compliance/LaunchGateEvaluationTest.php` cover §11.6 items 1–6, 9
 and 10. Items 7 and 8 (production provider endpoints and credentials) are in
 `tests/Feature/GameProviders/LaunchTest.php`.
+
+The Milestone 8 evidence pack and sign-off checklist are in
+[regulatory-readiness/](regulatory-readiness/README.md).

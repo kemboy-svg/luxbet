@@ -53,11 +53,16 @@ class SimulatorRoundTest extends TestCase
         $player = $this->playerUser();
         $session = $this->launchSession($player, 'royal-21');
 
-        $this->actingAs($player)
+        $display = $this->actingAs($player)
             ->postJson("/api/v1/game-sessions/{$session->session_reference}/simulator-rounds", ['stake' => 50])
             ->assertOk()
             ->assertJsonPath('data.display.kind', 'blackjack')
-            ->assertJsonCount(2, 'data.display.player_cards');
+            ->assertJsonStructure(['data' => ['display' => ['player_total', 'dealer_total', 'note']]])
+            ->json('data.display');
+
+        // A hand starts with two cards and may draw more.
+        $this->assertGreaterThanOrEqual(2, count($display['player_cards']));
+        $this->assertGreaterThanOrEqual(2, count($display['dealer_cards']));
     }
 
     public function test_only_configured_stakes_are_accepted(): void
