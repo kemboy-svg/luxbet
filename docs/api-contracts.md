@@ -87,9 +87,14 @@ Public catalogue. Query: `category`, `search` (name, max 100 chars),
     "status": "playable",
     "playable": true,
     "demo_only": true,
-    "provider": { "name": "Local simulator", "is_simulator": true }
+    "provider": { "name": "Local simulator", "is_simulator": true },
+    "simulation": { "rtp": 95.6, "volatility": "low" }
 }
 ```
+
+`simulation` is set only for local-simulator games: the design
+return-to-player (%) and, for slots, the volatility profile. See
+[simulator-games.md](simulator-games.md).
 
 `status` is `playable`, `demo_not_offered` (the provider has no demo) or
 `coming_soon` (the category has no approved integration yet). Responses never
@@ -203,7 +208,7 @@ The signed-in player's sessions (another player's session returns `404`).
 
 Local simulator only. Body `{ "stake": 100 }` (one of 10, 50, 100, 250, 500).
 Returns `round_id`, `stake`, `payout`, `result` (`win`, `lose`, `push`),
-`display` (reels or cards) and the new `balance`. `422 DEMO_SESSION_REFUSED`
+`display` and the new `balance`. Slots `display`: `reels` (5×3 symbols), `lines` (winning paylines with `line`, `symbol`, `count`), `profile` and `tier` (`none`, `small` = less than the stake back, `win`, `big` ≥ 5×, `mega` ≥ 20×). Table games `display`: `player_cards`, `dealer_cards`, `player_total`, `dealer_total`, labels, a `note` explaining the result and `tier`. `422 DEMO_SESSION_REFUSED`
 for closed sessions, other stakes or not enough credits.
 
 ### `POST /api/v1/webhooks/providers/{slug}`

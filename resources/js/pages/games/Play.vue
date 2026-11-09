@@ -7,18 +7,37 @@ import LuxBetLogo from '@/components/luxbet/LuxBetLogo.vue';
 import SlotSymbol from '@/components/luxbet/SlotSymbol.vue';
 import type { CatalogueGame } from '@/types/luxbet';
 
+type Tier = 'none' | 'small' | 'win' | 'big' | 'mega';
+
 type RoundDisplay =
     | {
           kind: 'slots';
           reels: string[][];
+          lines: { line: number; symbol: string; count: number }[];
           winning_symbol: string | null;
           match_count: number;
+          tier: Tier;
       }
     | {
           kind: 'blackjack' | 'baccarat';
           player_cards: string[];
           dealer_cards: string[];
+          player_total: number;
+          dealer_total: number;
+          player_label: string;
+          dealer_label: string;
+          note: string;
+          tier: Tier;
       };
+
+// Row used on each reel by each payline (must match the server engine).
+const PAYLINES = [
+    [1, 1, 1, 1, 1],
+    [0, 0, 0, 0, 0],
+    [2, 2, 2, 2, 2],
+    [0, 1, 2, 1, 0],
+    [2, 1, 0, 1, 2],
+];
 
 type Round = {
     round_id: string;
@@ -73,18 +92,48 @@ const tableCards = computed(() =>
 
 const credits = (value: number): string => value.toLocaleString('en');
 
+// Cells on winning paylines, as "reel-row" keys, for highlighting.
+const winningCells = computed(() => {
+    const cells = new Set<string>();
+    const display = lastRound.value?.display;
+    if (display?.kind === 'slots') {
+        for (const win of display.lines) {
+            for (let reel = 0; reel < win.count; reel++) {
+                cells.add(`${reel}-${PAYLINES[win.line][reel]}`);
+            }
+        }
+    }
+    return cells;
+});
+
+const tier = computed<Tier>(() => lastRound.value?.display.tier ?? 'none');
+
 const resultText = computed(() => {
     const round = lastRound.value;
     if (!round) {
         return null;
     }
-    if (round.result === 'win') {
-        return `You won ${credits(round.payout)} demo credits`;
-    }
+    const note =
+        round.display.kind === 'slots' ? '' : `${round.display.note} · `;
     if (round.result === 'push') {
-        return 'Push — stake returned';
+        return `${note}stake returned`;
     }
-    return 'No win this time';
+    if (round.payout === 0) {
+        return round.display.kind === 'slots'
+            ? 'No win this time'
+            : `${note}no win`;
+    }
+    const amount = `${credits(round.payout)} demo credits`;
+    switch (round.display.tier) {
+        case 'small':
+            return `${note}Small win: ${amount} back from your ${credits(round.stake)} stake`;
+        case 'big':
+            return `${note}Big win! ${amount}`;
+        case 'mega':
+            return `${note}Mega win! ${amount}`;
+        default:
+            return `${note}You won ${amount}`;
+    }
 });
 
 // Responsible-play reminder: shown every N minutes the player has this
@@ -256,8 +305,17 @@ function endSession(): void {
                             <div
                                 v-for="(symbol, s) in reel"
                                 :key="s"
-                                class="flex aspect-square items-center justify-center rounded-lg bg-linear-to-b from-[#2B0D3F] via-[#1A0828] to-[#2B0D3F] p-2 transition-opacity"
-                                :class="{ 'opacity-40': playing }"
+                                class="flex aspect-square items-center justify-center rounded-lg bg-linear-to-b from-[#2B0D3F] via-[#1A0828] to-[#2B0D3F] p-2 transition"
+                                :class="{
+                                    'opacity-40': playing,
+                                    'shadow-[inset_0_0_0_3px_#FFD45A,0_0_18px_rgba(255,212,90,0.6)]':
+                                        !playing &&
+                                        winningCells.has(`${r}-${s}`),
+                                    'opacity-60':
+                                        !playing &&
+                                        winningCells.size > 0 &&
+                                        !winningCells.has(`${r}-${s}`),
+                                }"
                             >
                                 <SlotSymbol
                                     :symbol="symbol"
@@ -273,19 +331,46 @@ function endSession(): void {
                         aria-live="polite"
                     >
                         <div
-                            v-for="(hand, label) in {
-                                Dealer: tableCards?.dealer_cards ?? ['?', '?'],
-                                You: tableCards?.player_cards ?? ['?', '?'],
-                            }"
-                            :key="label"
-                            class="flex items-center gap-4"
+                            v-for="hand in [
+                                {
+                                    label:
+                                        tableCards?.dealer_label ??
+                                        (game.category === 'baccarat'
+                                            ? 'Banker'
+                                            : 'Dealer'),
+                                    cards: tableCards?.dealer_cards ?? [
+                                        '?',
+                                        '?',
+                                    ],
+                                    total: tableCards?.dealer_total,
+                                },
+                                {
+                                    label:
+                                        tableCards?.player_label ??
+                                        (game.category === 'baccarat'
+                                            ? 'Player'
+                                            : 'You'),
+                                    cards: tableCards?.player_cards ?? [
+                                        '?',
+                                        '?',
+                                    ],
+                                    total: tableCards?.player_total,
+                                },
+                            ]"
+                            :key="hand.label"
+                            class="flex flex-wrap items-center gap-3 sm:gap-4"
                         >
                             <span
-                                class="w-16 text-sm font-bold text-gold-200"
-                                >{{ label }}</span
+                                class="flex w-16 flex-col text-sm font-bold text-gold-200"
+                                >{{ hand.label
+                                }}<span
+                                    v-if="hand.total !== undefined"
+                                    class="text-2xl text-white tabular-nums"
+                                    >{{ hand.total }}</span
+                                ></span
                             >
                             <span
-                                v-for="(card, i) in hand"
+                                v-for="(card, i) in hand.cards"
                                 :key="i"
                                 class="flex h-24 w-16 items-center justify-center rounded-lg border border-[#C9C1B1] bg-white text-xl font-bold shadow-lg"
                                 :class="
@@ -301,10 +386,13 @@ function endSession(): void {
             </div>
 
             <p
-                class="min-h-7 text-center text-lg font-bold"
-                :class="
-                    lastRound?.result === 'win' ? 'text-gold-300' : 'text-white'
-                "
+                class="min-h-7 text-center font-bold"
+                :class="{
+                    'text-lg text-white': tier === 'none' || tier === 'small',
+                    'text-xl text-gold-300': tier === 'win',
+                    'font-display text-3xl tracking-wide text-gold-300 [text-shadow:0_0_18px_rgba(255,200,80,0.8)]':
+                        tier === 'big' || tier === 'mega',
+                }"
                 role="status"
             >
                 {{ resultText }}
@@ -401,6 +489,10 @@ function endSession(): void {
                 {{ playing ? '…' : isSlots ? 'SPIN' : 'DEAL' }}
             </button>
 
+            <p v-if="isSlots" class="w-full text-center text-xs text-plum-200">
+                5 paylines · 3 or more matching from the left pay · crown is
+                wild
+            </p>
             <p class="w-full text-center text-xs text-plum-200">
                 Local simulator — not a certified casino game · credits have no
                 cash value ·

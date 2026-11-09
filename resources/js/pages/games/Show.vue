@@ -157,6 +157,21 @@ const providerLabel = computed(() =>
                                 Starts a 30-minute demo session. Only demo
                                 credits are used.
                             </p>
+                            <p
+                                v-if="game.simulation"
+                                class="text-xs text-plum-200"
+                            >
+                                Simulated return about
+                                {{ game.simulation.rtp }}%<template
+                                    v-if="game.simulation.volatility"
+                                >
+                                    ·
+                                    {{ game.simulation.volatility }}
+                                    volatility</template
+                                >
+                                · design figure for this demo, not a certified
+                                game
+                            </p>
                         </template>
                     </div>
                     <div

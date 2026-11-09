@@ -50,6 +50,11 @@ export type CatalogueGame = {
     playable: boolean;
     demo_only: true;
     provider: { name: string; is_simulator: boolean };
+    /** Design figures for local-simulator games; null otherwise. */
+    simulation: {
+        rtp: number;
+        volatility: 'low' | 'medium' | 'high' | null;
+    } | null;
 };
 
 /** One demo session as summarised on the dashboard and play history. */
