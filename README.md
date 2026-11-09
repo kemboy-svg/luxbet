@@ -3,6 +3,10 @@
 A secure, modular casino platform built with Laravel 13, Vue 3, Inertia and
 PostgreSQL.
 
+**Status:** all eight milestones delivered as a demo-only platform. See
+[docs/project-status.md](docs/project-status.md) for what is done and what
+the owner still has to do.
+
 > **Demo only.** Real-money gambling, deposits, withdrawals, wagering and
 > cash-equivalent rewards are disabled and enforced server-side. Demo credits
 > are fictional and have no monetary value. See
@@ -49,12 +53,14 @@ with `MAIL_MAILER=log`, or to Mailpit at http://localhost:8025 with
 
 ### Staff accounts
 
-Everyone who registers is a demo player. To make a local staff account,
-register normally, then:
+Everyone who registers is a demo player, and player accounts can never hold
+staff roles. Create a separate local super admin:
 
 ```bash
-php artisan tinker --execute="App\Models\User::where('email', 'you@example.test')->firstOrFail()->assignRole('super_admin');"
+php artisan tinker --execute="\$u = App\Models\User::create(['name' => 'Local Admin', 'email' => 'admin@example.test', 'password' => 'a-long-local-password']); \$u->forceFill(['email_verified_at' => now()])->save(); \$u->assignRole('super_admin');"
 ```
+
+Further staff can then be added from **Admin → Staff**.
 
 Staff must turn on two-factor authentication (Settings → Security) before the
 admin area at `/admin` opens. Roles and permissions are listed in
@@ -66,7 +72,8 @@ http://localhost:8080.
 
 ## What's in the app
 
-- **Players:** game lobby, demo play with the local simulator, demo wallet,
+- **Players:** game lobby, demo play with the local simulator (slots,
+  blackjack, baccarat; see [docs/simulator-games.md](docs/simulator-games.md)), demo wallet,
   dashboard with recent activity, favourites, play history, profile
   preferences and responsible-play settings (session reminders, marketing
   opt-in).
