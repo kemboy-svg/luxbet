@@ -431,6 +431,18 @@ function endSession(): void {
                     </button>
                 </div>
             </div>
+            <div
+                v-if="!sessionOpen"
+                role="status"
+                class="flex flex-col items-center gap-2 rounded-2xl border border-demo-band bg-plum-950/90 px-5 py-4 text-center"
+            >
+                <p class="font-bold">This demo session has ended.</p>
+                <Link
+                    :href="`/games/${game.slug}`"
+                    class="rounded-lg bg-linear-to-b from-gold-200 via-gold-500 to-gold-600 px-4 py-2 text-sm font-bold text-gold-900"
+                    >Start a new session</Link
+                >
+            </div>
             <p
                 v-if="error"
                 class="rounded-lg bg-plum-950/80 px-4 py-2 text-center text-sm text-[#F4A79D]"
