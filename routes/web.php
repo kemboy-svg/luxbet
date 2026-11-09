@@ -23,21 +23,21 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('demo-wallet', [DemoWalletController::class, 'show'])->name('demo-wallet.show');
     Route::post('demo-wallet/reset', [DemoWalletController::class, 'reset'])
-        ->middleware('throttle:10,1')
+        ->middleware('throttle:10,1,demo-wallet.reset')
         ->name('demo-wallet.reset');
 
     Route::post('games/{slug}/favourite', [FavouriteController::class, 'store'])
         ->where('slug', '[a-z0-9]+(?:-[a-z0-9]+)*')
-        ->middleware('throttle:60,1')
+        ->middleware('throttle:60,1,games.favourite.store')
         ->name('games.favourite.store');
     Route::delete('games/{slug}/favourite', [FavouriteController::class, 'destroy'])
         ->where('slug', '[a-z0-9]+(?:-[a-z0-9]+)*')
-        ->middleware('throttle:60,1')
+        ->middleware('throttle:60,1,games.favourite.destroy')
         ->name('games.favourite.destroy');
 
     Route::post('games/{slug}/play', [PlayController::class, 'start'])
         ->where('slug', '[a-z0-9]+(?:-[a-z0-9]+)*')
-        ->middleware('throttle:20,1')
+        ->middleware('throttle:20,1,games.play')
         ->name('games.play');
 
     // Local simulator game screen: only reachable through the signed launch URL.

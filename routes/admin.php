@@ -40,12 +40,12 @@ Route::get('players/{player}', [PlayerController::class, 'show'])
 
 Route::patch('players/{player}/status', PlayerStatusController::class)
     ->whereUuid('player')
-    ->middleware('throttle:30,1')
+    ->middleware('throttle:30,1,players.status.update')
     ->name('players.status.update');
 
 Route::post('players/{player}/demo-wallet/adjustments', DemoWalletAdjustmentController::class)
     ->whereUuid('player')
-    ->middleware('throttle:30,1')
+    ->middleware('throttle:30,1,players.demo-wallet.adjustments.store')
     ->name('players.demo-wallet.adjustments.store');
 
 Route::get('games', [GameController::class, 'index'])
@@ -54,7 +54,7 @@ Route::get('games', [GameController::class, 'index'])
 
 Route::patch('games/{game:id}', [GameController::class, 'update'])
     ->whereUuid('game')
-    ->middleware('throttle:60,1')
+    ->middleware('throttle:60,1,games.update')
     ->name('games.update');
 
 Route::get('providers', [ProviderController::class, 'index'])
@@ -63,7 +63,7 @@ Route::get('providers', [ProviderController::class, 'index'])
 
 Route::patch('providers/{provider}/status', [ProviderController::class, 'updateStatus'])
     ->whereUuid('provider')
-    ->middleware('throttle:30,1')
+    ->middleware('throttle:30,1,providers.status.update')
     ->name('providers.status.update');
 
 Route::get('launch-control', LaunchControlController::class)
@@ -90,14 +90,14 @@ Route::get('system-health', SystemHealthController::class)
 Route::middleware(['can:staff.manage', 'password.confirm'])->group(function () {
     Route::get('staff', [StaffController::class, 'index'])->name('staff.index');
     Route::post('staff', [StaffController::class, 'store'])
-        ->middleware('throttle:10,1')
+        ->middleware('throttle:10,1,staff.store')
         ->name('staff.store');
     Route::post('staff/{staff}/roles', [StaffController::class, 'grant'])
         ->whereUuid('staff')
-        ->middleware('throttle:30,1')
+        ->middleware('throttle:30,1,staff.roles.store')
         ->name('staff.roles.store');
     Route::delete('staff/{staff}/roles', [StaffController::class, 'revoke'])
         ->whereUuid('staff')
-        ->middleware('throttle:30,1')
+        ->middleware('throttle:30,1,staff.roles.destroy')
         ->name('staff.roles.destroy');
 });
