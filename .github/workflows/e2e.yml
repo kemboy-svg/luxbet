@@ -1,0 +1,94 @@
+name: e2e
+
+# Real-browser smoke test of demo play against a running app (production
+# build, CSP on). Screenshots and a report are uploaded as an artifact.
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  demo-play:
+    runs-on: ubuntu-latest
+
+    services:
+      pgsql:
+        image: postgres:16.6-alpine
+        env:
+          POSTGRES_DB: luxbet
+          POSTGRES_USER: luxbet
+          POSTGRES_PASSWORD: luxbet_local_only
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U luxbet -d luxbet"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+      redis:
+        image: redis:7.4.2-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+
+    env:
+      APP_URL: http://127.0.0.1:8000
+      DB_HOST: 127.0.0.1
+      REDIS_HOST: 127.0.0.1
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # v2
+        with:
+          php-version: '8.4'
+          extensions: pdo_pgsql, redis, intl, zip
+          tools: composer:v2
+          coverage: none
+
+      - name: Setup Node
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '22'
+
+      - name: Install and build
+        run: |
+          composer install --no-interaction --prefer-dist --no-progress
+          cp .env.example .env
+          php artisan key:generate
+          npm ci
+          npm run build
+          php artisan migrate --seed --force
+
+      - name: Start the app
+        run: |
+          php artisan serve --host=127.0.0.1 --port=8000 > storage/logs/serve.log 2>&1 &
+          for i in $(seq 1 30); do curl -sf http://127.0.0.1:8000/up && break; sleep 1; done
+
+      - name: Install Playwright
+        run: |
+          npm install --no-save playwright@1
+          npx playwright install --with-deps chromium
+
+      - name: Play demo games in a browser
+        run: node tests/e2e/demo-play.mjs
+
+      - name: Upload screenshots and report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: demo-play
+          path: |
+            tests/e2e/output/
+            storage/logs/
+          retention-days: 14

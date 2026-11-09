@@ -192,4 +192,21 @@ class LaunchTest extends TestCase
 
         $this->assertSame(GameSessionStatus::Completed, $session->refresh()->status);
     }
+
+    public function test_playing_many_rounds_does_not_block_starting_another_game(): void
+    {
+        $player = $this->playerUser();
+        $session = $this->launchSession($player);
+
+        for ($i = 0; $i < 25; $i++) {
+            $this->actingAs($player)
+                ->postJson("/api/v1/game-sessions/{$session->session_reference}/simulator-rounds", ['stake' => 10])
+                ->assertOk();
+        }
+
+        // Each route has its own rate-limit counter, so 25 rounds do not use
+        // up the 20-per-minute allowance for starting games.
+        $this->actingAs($player)->post('/games/royal-21/play')->assertRedirect();
+        $this->actingAs($player)->post('/games/candy-crown/favourite')->assertRedirect();
+    }
 }
