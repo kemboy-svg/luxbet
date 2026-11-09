@@ -99,6 +99,20 @@ class LaunchTest extends TestCase
         $this->assertSame(10_000, $player->demoWallets()->sole()->balance_minor);
     }
 
+    public function test_the_game_launches_when_the_site_is_opened_on_another_local_host(): void
+    {
+        // A common local setup: APP_URL says localhost but the browser uses 127.0.0.1.
+        config(['app.url' => 'http://localhost:8000']);
+        $player = $this->playerUser();
+
+        $response = $this->actingAs($player)->post('http://127.0.0.1:8000/games/candy-crown/play');
+
+        $response->assertSessionHasNoErrors()->assertRedirect();
+        $this->assertStringStartsWith('http://127.0.0.1:8000/play/', (string) $response->headers->get('Location'));
+
+        $this->actingAs($player)->get((string) $response->headers->get('Location'))->assertOk();
+    }
+
     public function test_launch_urls_off_the_allowlist_are_refused(): void
     {
         config(['luxbet.providers.adapters.local-simulator' => HostileLaunchAdapter::class]);

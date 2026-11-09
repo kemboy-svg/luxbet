@@ -6,8 +6,13 @@ use App\Domain\GameProviders\Exceptions\DemoSessionRefused;
 
 /**
  * Only launch URLs on allowlisted hosts are ever sent to the browser.
- * HTTPS is required, except for this app's own URL (the local simulator).
+ * HTTPS is required, except for this app's own origin (the local simulator).
  * URLs carrying credentials are refused.
+ *
+ * "This app's own origin" is APP_URL and the origin of the current request:
+ * locally the site is often opened as 127.0.0.1:8000 while APP_URL says
+ * localhost:8000, and our own signed URLs are generated for the host the
+ * player actually used.
  */
 class LaunchUrlGuard
 {
@@ -21,9 +26,12 @@ class LaunchUrlGuard
 
         $host = strtolower($parts['host']);
         $scheme = strtolower($parts['scheme']);
-        $app = $this->appOrigin();
-
-        $isAppOrigin = $app !== null && $host === $app['host'] && $scheme === $app['scheme'];
+        $isAppOrigin = false;
+        foreach ($this->appOrigins() as $app) {
+            if ($host === $app['host'] && $scheme === $app['scheme']) {
+                $isAppOrigin = true;
+            }
+        }
         $isAllowlisted = $scheme === 'https' && in_array($host, $this->extraHosts(), true);
 
         if (! $isAppOrigin && ! $isAllowlisted) {
@@ -32,17 +40,21 @@ class LaunchUrlGuard
     }
 
     /**
-     * @return array{scheme: string, host: string}|null
+     * @return list<array{scheme: string, host: string}>
      */
-    private function appOrigin(): ?array
+    private function appOrigins(): array
     {
-        $parts = parse_url((string) config('app.url'));
+        $origins = [];
 
-        if ($parts === false || ! isset($parts['scheme'], $parts['host'])) {
-            return null;
+        foreach ([(string) config('app.url'), request()->root()] as $root) {
+            $parts = parse_url($root);
+
+            if ($root !== '' && $parts !== false && isset($parts['scheme'], $parts['host'])) {
+                $origins[] = ['scheme' => strtolower($parts['scheme']), 'host' => strtolower($parts['host'])];
+            }
         }
 
-        return ['scheme' => strtolower($parts['scheme']), 'host' => strtolower($parts['host'])];
+        return $origins;
     }
 
     /**
