@@ -61,7 +61,7 @@ ENTRYPOINT ["luxbet-entrypoint"]
 CMD ["php-fpm"]
 
 # --- Web: Caddy serves static assets, proxies PHP and handles HTTPS ----------
-FROM caddy:2.10-alpine AS web
+FROM caddy:2.11-alpine AS web
 
 COPY deploy/docker/Caddyfile /etc/caddy/Caddyfile
 COPY --from=build /var/www/html/public /var/www/html/public
