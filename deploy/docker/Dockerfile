@@ -10,7 +10,7 @@
 # Dependabot proposes the rest. Containers run as non-root users.
 
 # --- Base: PHP-FPM with the extensions LuxBet needs --------------------------
-FROM php:8.4-fpm-bookworm AS base
+FROM php:8.5-fpm-bookworm AS base
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends libpq-dev libicu-dev libzip-dev unzip \
